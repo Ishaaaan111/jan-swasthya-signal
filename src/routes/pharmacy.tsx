@@ -1,7 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { AppNav } from "@/components/AppNav";
-import { salesRows, submissionLog } from "@/lib/grid-data";
+import { useAuth } from "@/lib/auth";
+import { usePharmacyData, useSubmitPharmacySales } from "@/hooks/useSurveillanceData";
+import { isSupabaseConfigured } from "@/lib/supabase";
 
 export const Route = createFileRoute("/pharmacy")({
   head: () => ({
@@ -25,7 +27,27 @@ export const Route = createFileRoute("/pharmacy")({
 });
 
 function Pharmacy() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate({ to: "/login" });
+    }
+  }, [user, navigate]);
+
+  const { data } = usePharmacyData();
+  const salesRows = data?.sales ?? [];
+  const submissionLog = data?.submissions ?? [];
+  const submitSalesMutation = useSubmitPharmacySales();
   const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = () => {
+    setSubmitted(true);
+    submitSalesMutation.mutate({ pharmacyId: "PH-TN-2204", entryCount: 18 });
+  };
+
+  if (!user) return null;
 
   return (
     <div className="min-h-screen">
@@ -97,11 +119,15 @@ function Pharmacy() {
             </div>
 
             <button
-              onClick={() => setSubmitted(true)}
-              disabled={submitted}
+              onClick={handleSubmit}
+              disabled={submitted || submitSalesMutation.isPending}
               className="mt-4 w-full rounded-xl bg-primary px-4 py-3 font-display text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
             >
-              {submitted ? "Submitted · signals sent to district grid" : "Confirm and submit today's data"}
+              {submitted
+                ? "Submitted · signals sent to district grid"
+                : submitSalesMutation.isPending
+                  ? "Submitting..."
+                  : "Confirm and submit today's data"}
             </button>
           </section>
 

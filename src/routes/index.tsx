@@ -1,7 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useNavigate, createFileRoute } from "@tanstack/react-router";
 import { AppNav } from "@/components/AppNav";
-import { alertHistory, phcs, zones, type Zone } from "@/lib/grid-data";
+import { DistrictMap } from "@/components/DistrictMap";
+import { useAuth } from "@/lib/auth";
+import { useZones, useAlertHistory, usePhcList, useAssignCamp } from "@/hooks/useSurveillanceData";
+import { isSupabaseConfigured } from "@/lib/supabase";
+import type { RiskLevel } from "@/lib/grid-data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,17 +42,38 @@ const dotClass = {
 } as const;
 
 function Dashboard() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate({ to: "/login" });
+    }
+  }, [user, navigate]);
+
+  const { data: zones = [] } = useZones();
+  const { data: alertHistory = [] } = useAlertHistory();
+  const { data: phcs = [] } = usePhcList();
+  const assignCampMutation = useAssignCamp();
+
   const [selectedId, setSelectedId] = useState<string | null>("pattukkottai");
   const [assigned, setAssigned] = useState<Record<string, string>>({});
-  const selected = useMemo(() => zones.find((z) => z.id === selectedId) ?? null, [selectedId]);
+  const selected = useMemo(() => zones.find((z) => z.id === selectedId) ?? null, [zones, selectedId]);
 
   const counts = useMemo(
     () => ({
       high: zones.filter((z) => z.risk === "high").length,
       watch: zones.filter((z) => z.risk === "watch").length,
     }),
-    [],
+    [zones],
   );
+
+  const handleAssignCamp = (zoneId: string, phcName: string) => {
+    setAssigned((prev) => ({ ...prev, [zoneId]: phcName }));
+    assignCampMutation.mutate({ zoneId, phcName });
+  };
+
+  if (!user) return null;
 
   return (
     <div className="min-h-screen">
@@ -63,9 +88,25 @@ function Dashboard() {
               confirmed camp diagnoses.
             </p>
           </div>
-          <span className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs text-muted-foreground">
-            Signals ingested today · <span className="text-foreground">4,812</span>
-          </span>
+          <div className="flex items-center gap-2.5">
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium ${
+                isSupabaseConfigured
+                  ? "border-safe/50 bg-safe-soft text-safe"
+                  : "border-watch/50 bg-watch-soft text-watch"
+              }`}
+            >
+              <span
+                className={`size-1.5 rounded-full ${
+                  isSupabaseConfigured ? "bg-safe animate-pulse" : "bg-watch"
+                }`}
+              />
+              {isSupabaseConfigured ? "Supabase Live DB" : "Local Database Mode"}
+            </span>
+            <span className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs text-muted-foreground">
+              Signals ingested today · <span className="text-foreground">4,812</span>
+            </span>
+          </div>
         </div>
 
         <div className="grid gap-4 lg:grid-cols-[290px_minmax(0,1fr)_300px]">
@@ -77,7 +118,7 @@ function Dashboard() {
                 <li key={a.zone} className="rounded-xl border border-border bg-surface-2 p-3">
                   <p className="font-display text-sm font-semibold">{a.zone}</p>
                   <span
-                    className={`mt-1.5 inline-block rounded-full border px-2 py-0.5 text-[11px] font-medium ${toneClass[a.tone]}`}
+                    className={`mt-1.5 inline-block rounded-full border px-2 py-0.5 text-[11px] font-medium ${toneClass[a.tone as keyof typeof toneClass] || toneClass.normal}`}
                   >
                     {a.tag}
                   </span>
@@ -90,40 +131,27 @@ function Dashboard() {
           {/* Map */}
           <section className="panel relative overflow-hidden p-4">
             <div className="flex items-center justify-between">
-              <h2 className="label-eyebrow">District risk map — click a zone</h2>
+              <h2 className="label-eyebrow">District GIS Risk Map — Thanjavur</h2>
               <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                 <Legend color="bg-high" label="High" />
                 <Legend color="bg-watch" label="Watch" />
                 <Legend color="bg-safe" label="Normal" />
+                <span className="inline-flex items-center gap-1">
+                  <span className="text-blue-400">🏥</span> PHC
+                </span>
               </div>
             </div>
 
-            <div
-              className="relative mt-3 h-[520px] rounded-xl border border-border bg-background/60"
-              style={{
-                backgroundImage:
-                  "linear-gradient(to right, oklch(1 0 0 / 0.04) 1px, transparent 1px), linear-gradient(to bottom, oklch(1 0 0 / 0.04) 1px, transparent 1px)",
-                backgroundSize: "11.11% 12.5%",
-              }}
-            >
-              {zones.map((z) => (
-                <button
-                  key={z.id}
-                  onClick={() => setSelectedId(z.id)}
-                  style={{ left: `${z.col * 11.11}%`, top: `${z.row * 12.5}%` }}
-                  className={`absolute -translate-x-1/2 rounded-xl border px-3 py-2 text-left transition-transform hover:scale-105 ${toneClass[z.risk]} ${
-                    selectedId === z.id ? "ring-2 ring-ring" : ""
-                  } ${z.risk === "high" ? "pulse-alert" : ""}`}
-                >
-                  <span className="block font-display text-[13px] font-semibold text-foreground">
-                    {z.name}
-                  </span>
-                  <span className="block text-[11px]">{z.disease}</span>
-                </button>
-              ))}
+            <div className="relative mt-3">
+              <DistrictMap
+                zones={zones}
+                phcs={phcs}
+                selectedId={selectedId}
+                onSelectZone={(id) => setSelectedId(id)}
+              />
 
               {selected && (
-                <aside className="absolute inset-y-3 right-3 w-[290px] overflow-y-auto rounded-xl border border-border bg-popover p-4 shadow-2xl">
+                <aside className="absolute inset-y-3 right-3 z-[500] w-[290px] overflow-y-auto rounded-xl border border-border bg-popover/95 backdrop-blur-md p-4 shadow-2xl">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <h3 className="font-display text-lg font-bold">{selected.name}</h3>
@@ -184,9 +212,7 @@ function Dashboard() {
                               .map((p) => (
                                 <button
                                   key={p.name}
-                                  onClick={() =>
-                                    setAssigned((a) => ({ ...a, [selected.id]: p.name }))
-                                  }
+                                  onClick={() => handleAssignCamp(selected.id, p.name)}
                                   className="flex w-full items-center justify-between rounded-lg border border-border bg-surface-2 px-3 py-2 text-xs transition-colors hover:border-ring hover:bg-accent"
                                 >
                                   <span>{p.name}</span>

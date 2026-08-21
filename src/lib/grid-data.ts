@@ -10,6 +10,8 @@ export type Zone = {
   score: number;
   col: number;
   row: number;
+  lat: number;
+  lng: number;
   signals: { label: string; delta: string; weight: number }[];
   population: string;
 };
@@ -25,6 +27,8 @@ export const zones: Zone[] = [
     score: 91,
     col: 2,
     row: 5,
+    lat: 10.4278,
+    lng: 79.3175,
     population: "62,400",
     signals: [
       { label: "Cough syrup + antibiotic sales", delta: "+80%", weight: 92 },
@@ -43,6 +47,8 @@ export const zones: Zone[] = [
     score: 84,
     col: 4,
     row: 2,
+    lat: 10.4892,
+    lng: 79.3957,
     population: "38,100",
     signals: [
       { label: "Glucometer readings >180 mg/dL", delta: "19 of 26", weight: 88 },
@@ -60,6 +66,8 @@ export const zones: Zone[] = [
     score: 80,
     col: 6,
     row: 3,
+    lat: 10.2526,
+    lng: 79.2562,
     population: "27,800",
     signals: [
       { label: "Hemoglobin readings <9 g/dL", delta: "23 of 40", weight: 85 },
@@ -77,6 +85,8 @@ export const zones: Zone[] = [
     score: 58,
     col: 5,
     row: 6,
+    lat: 10.3394,
+    lng: 79.3822,
     population: "44,200",
     signals: [
       { label: "Hemoglobin readings <11 g/dL", delta: "12 of 31", weight: 62 },
@@ -93,6 +103,8 @@ export const zones: Zone[] = [
     score: 55,
     col: 7,
     row: 5,
+    lat: 10.3045,
+    lng: 79.1678,
     population: "31,500",
     signals: [
       { label: "Antidiabetic sales", delta: "+17%", weight: 58 },
@@ -109,6 +121,8 @@ export const zones: Zone[] = [
     score: 14,
     col: 1,
     row: 2,
+    lat: 10.9234,
+    lng: 79.2789,
     population: "35,900",
     signals: [{ label: "All signal streams within baseline", delta: "stable", weight: 12 }],
   },
@@ -122,6 +136,8 @@ export const zones: Zone[] = [
     score: 19,
     col: 8,
     row: 2,
+    lat: 10.9602,
+    lng: 79.3845,
     population: "1,40,000",
     signals: [{ label: "Post-camp follow-up clear", delta: "stable", weight: 16 }],
   },
@@ -135,11 +151,11 @@ export const alertHistory = [
 ] as const;
 
 export const phcs = [
-  { name: "PHC Orathanadu", km: 12, status: "available" },
-  { name: "PHC Papanasam", km: 18, status: "available" },
-  { name: "PHC Budalur", km: 24, status: "partial" },
-  { name: "PHC Thiruvaiyaru", km: 31, status: "occupied" },
-  { name: "PHC Ammapettai", km: 38, status: "available" },
+  { name: "PHC Orathanadu", km: 12, status: "available", lat: 10.6272, lng: 79.2565 },
+  { name: "PHC Papanasam", km: 18, status: "available", lat: 10.9234, lng: 79.2789 },
+  { name: "PHC Budalur", km: 24, status: "partial", lat: 10.7963, lng: 78.9958 },
+  { name: "PHC Thiruvaiyaru", km: 31, status: "occupied", lat: 10.8841, lng: 79.1065 },
+  { name: "PHC Ammapettai", km: 38, status: "available", lat: 10.7906, lng: 79.3181 },
 ] as const;
 
 export const salesRows = [
