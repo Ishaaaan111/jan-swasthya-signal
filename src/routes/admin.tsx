@@ -8,7 +8,7 @@ import { useZones, usePhcList } from "@/hooks/useSurveillanceData";
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin Console · Jan Swasthya Signal Grid" },
+      { title: "State Admin Console · Jan Swasthya Signal Grid" },
       {
         name: "description",
         content: "State-wide surveillance command center, multi-stream ingestion audit, and role access management.",
@@ -96,84 +96,88 @@ function AdminPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <AppNav />
 
-      <main className="mx-auto max-w-[1500px] px-5 py-6">
+      <main className="mx-auto max-w-[1500px] px-4 py-5 sm:px-6">
         {/* State Banner */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-border pb-5">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="rounded-md border border-primary/40 bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary uppercase">
-                State Surveillance Directorate
-              </span>
-              <span className="text-xs text-muted-foreground">Tamil Nadu Health Department</span>
+        <div className="mb-6 rounded-lg border border-border bg-surface p-4 sm:p-5 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4 mb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="rounded bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary uppercase border border-primary/20">
+                  State Surveillance Directorate
+                </span>
+                <span className="text-xs text-muted-foreground font-medium">Tamil Nadu Health Department</span>
+              </div>
+              <h1 className="mt-1 text-xl font-bold font-display text-foreground sm:text-2xl">
+                Super Admin Command Center
+              </h1>
             </div>
-            <h1 className="mt-1 text-2xl font-bold font-display">Super Admin Command Center</h1>
+
+            <div className="flex items-center gap-2.5">
+              <Link
+                to="/"
+                className="rounded-md border border-border bg-surface-2 px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-accent flex items-center gap-1.5 shadow-xs"
+              >
+                <span>🩺</span> Open DHO Map
+              </Link>
+              <Link
+                to="/pharmacy"
+                className="rounded-md border border-border bg-surface-2 px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-accent flex items-center gap-1.5 shadow-xs"
+              >
+                <span>💊</span> Open Pharmacy Portal
+              </Link>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            <Link
-              to="/"
-              className="rounded-xl border border-border bg-surface-2 px-3.5 py-2 text-xs font-medium text-foreground hover:bg-accent flex items-center gap-1.5"
-            >
-              <span>🩺</span> Open DHO Map
-            </Link>
-            <Link
-              to="/pharmacy"
-              className="rounded-xl border border-border bg-surface-2 px-3.5 py-2 text-xs font-medium text-foreground hover:bg-accent flex items-center gap-1.5"
-            >
-              <span>💊</span> Open Pharmacy Portal
-            </Link>
+          {/* Panoramic KPI Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+            <div className="rounded-md border border-border bg-surface-2/60 p-3.5">
+              <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Signals Ingested Today</p>
+              <p className="mt-1.5 text-2xl font-bold font-display text-primary">4,812</p>
+              <p className="mt-0.5 text-[11px] text-emerald-700 font-semibold">↑ +14% vs 7-day avg</p>
+            </div>
+            <div className="rounded-md border border-red-200 bg-red-50/70 p-3.5">
+              <p className="text-[10px] uppercase font-bold text-red-800 tracking-wider">Red Disease Clusters</p>
+              <p className="mt-1.5 text-2xl font-bold font-display text-red-700">
+                {zones.filter((z) => z.risk === "high").length} Zones
+              </p>
+              <p className="mt-0.5 text-[11px] text-red-800 font-medium">Pattukkottai, Madukkur, Sethubava.</p>
+            </div>
+            <div className="rounded-md border border-emerald-200 bg-emerald-50/70 p-3.5">
+              <p className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider">Mobile Health Fleet</p>
+              <p className="mt-1.5 text-2xl font-bold font-display text-emerald-700">
+                {phcs.length} PHC Units
+              </p>
+              <p className="mt-0.5 text-[11px] text-emerald-800 font-medium">100% active field coverage</p>
+            </div>
+            <div className="rounded-md border border-border bg-surface-2/60 p-3.5">
+              <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Prediction Accuracy</p>
+              <p className="mt-1.5 text-2xl font-bold font-display text-foreground">89.4%</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">Retrained on 412 camp lab results</p>
+            </div>
           </div>
         </div>
 
-        {/* Panoramic KPI Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mb-6">
-          <div className="panel p-4">
-            <p className="text-xs uppercase text-muted-foreground font-mono">Signals Ingested Today</p>
-            <p className="mt-2 text-3xl font-bold font-display text-foreground">4,812</p>
-            <p className="mt-1 text-[11px] text-safe font-medium">↑ +14% vs 7-day average</p>
-          </div>
-          <div className="panel p-4">
-            <p className="text-xs uppercase text-muted-foreground font-mono">Red Disease Clusters</p>
-            <p className="mt-2 text-3xl font-bold font-display text-high">
-              {zones.filter((z) => z.risk === "high").length} Zones
-            </p>
-            <p className="mt-1 text-[11px] text-high font-medium">Pattukkottai, Madukkur, Sethubava.</p>
-          </div>
-          <div className="panel p-4">
-            <p className="text-xs uppercase text-muted-foreground font-mono">Mobile Health Fleet</p>
-            <p className="mt-2 text-3xl font-bold font-display text-safe">
-              {phcs.length} PHC Units
-            </p>
-            <p className="mt-1 text-[11px] text-safe font-medium">100% active field coverage</p>
-          </div>
-          <div className="panel p-4">
-            <p className="text-xs uppercase text-muted-foreground font-mono">Prediction Accuracy</p>
-            <p className="mt-2 text-3xl font-bold font-display text-primary">89.4%</p>
-            <p className="mt-1 text-[11px] text-muted-foreground">Retrained on 412 camp lab results</p>
-          </div>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+        <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
           {/* Real-time Multi-stream Ingestion Audit Table */}
           <section className="panel p-5">
-            <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3 mb-4">
               <div>
-                <h2 className="label-eyebrow">Multi-Stream Signal Ingestion Stream</h2>
-                <p className="text-xs text-muted-foreground">
+                <h2 className="label-eyebrow text-foreground">Multi-Stream Signal Ingestion Telemetry</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
                   Automated fusion of pharmacy sales, PoC devices, schools, and wastewater telemetry
                 </p>
               </div>
-              <span className="rounded-full border border-safe/50 bg-safe-soft px-2.5 py-1 text-[11px] text-safe animate-pulse">
+              <span className="rounded bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 text-[11px] font-semibold">
                 Telemetry Active · 6 Streams
               </span>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-border">
+            <div className="overflow-x-auto rounded-md border border-border">
               <table className="w-full text-left text-xs">
-                <thead className="bg-surface-2 uppercase tracking-wider text-[10px] text-muted-foreground font-mono">
+                <thead className="bg-surface-2 uppercase tracking-wider text-[10px] text-muted-foreground font-bold border-b border-border">
                   <tr>
                     <th className="px-3.5 py-2.5">Stream ID</th>
                     <th className="px-3.5 py-2.5">Data Source</th>
@@ -184,15 +188,15 @@ function AdminPage() {
                     <th className="px-3.5 py-2.5">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody className="divide-y divide-border bg-surface">
                   {recentSignalStreams.map((s) => (
-                    <tr key={s.id} className="hover:bg-surface-2/40 transition-colors">
-                      <td className="px-3.5 py-3 font-mono text-muted-foreground">{s.id}</td>
-                      <td className="px-3.5 py-3 font-medium text-foreground">{s.source}</td>
-                      <td className="px-3.5 py-3 text-muted-foreground">{s.pincode}</td>
+                    <tr key={s.id} className="hover:bg-surface-2/60 transition-colors">
+                      <td className="px-3.5 py-3 font-mono text-muted-foreground font-medium">{s.id}</td>
+                      <td className="px-3.5 py-3 font-semibold text-foreground">{s.source}</td>
+                      <td className="px-3.5 py-3 text-muted-foreground font-mono">{s.pincode}</td>
                       <td className="px-3.5 py-3">
                         <span className="font-medium text-foreground">{s.indicator}</span>
-                        <span className="ml-1.5 font-mono text-high">{s.anomaly}</span>
+                        <span className="ml-1.5 font-mono font-bold text-red-600">{s.anomaly}</span>
                       </td>
                       <td className="px-3.5 py-3 text-right font-mono font-bold text-foreground">
                         {s.weight}%
@@ -200,10 +204,10 @@ function AdminPage() {
                       <td className="px-3.5 py-3 text-muted-foreground font-mono">{s.time}</td>
                       <td className="px-3.5 py-3">
                         <span
-                          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                          className={`rounded px-2 py-0.5 text-[10px] font-bold ${
                             s.status === "Flagged High"
-                              ? "bg-high-soft text-high border border-high/50"
-                              : "bg-safe-soft text-safe border border-safe/50"
+                              ? "bg-red-50 text-red-700 border border-red-200"
+                              : "bg-emerald-50 text-emerald-700 border border-emerald-200"
                           }`}
                         >
                           {s.status}
@@ -220,26 +224,26 @@ function AdminPage() {
           <div className="space-y-4">
             {/* Authorized Roles Directory */}
             <section className="panel p-4">
-              <h2 className="label-eyebrow mb-3">Role Directory & Access Tokens</h2>
+              <h2 className="label-eyebrow text-foreground mb-3">Role Directory & Access Control</h2>
               <ul className="space-y-2.5 text-xs">
-                <li className="p-3 rounded-xl border border-border bg-surface-2">
-                  <div className="flex items-center justify-between font-semibold">
+                <li className="p-3 rounded-md border border-border bg-surface-2/60">
+                  <div className="flex items-center justify-between font-semibold text-foreground">
                     <span>District Health Officer</span>
-                    <span className="text-safe text-[11px]">Active · 1 Officer</span>
+                    <span className="text-emerald-700 text-[11px] font-bold">Active · 1 Officer</span>
                   </div>
-                  <p className="text-muted-foreground text-[11px] mt-0.5">Dr. A. Senthilkumar · Thanjavur</p>
+                  <p className="text-muted-foreground text-[11px] mt-0.5">Dr. A. Senthilkumar · Thanjavur District</p>
                 </li>
-                <li className="p-3 rounded-xl border border-border bg-surface-2">
-                  <div className="flex items-center justify-between font-semibold">
+                <li className="p-3 rounded-md border border-border bg-surface-2/60">
+                  <div className="flex items-center justify-between font-semibold text-foreground">
                     <span>Pharmacy Partners</span>
-                    <span className="text-safe text-[11px]">Active · 48 Stores</span>
+                    <span className="text-emerald-700 text-[11px] font-bold">Active · 48 Stores</span>
                   </div>
                   <p className="text-muted-foreground text-[11px] mt-0.5">Sri Sai Medical Store + 47 others</p>
                 </li>
-                <li className="p-3 rounded-xl border border-border bg-surface-2">
-                  <div className="flex items-center justify-between font-semibold">
+                <li className="p-3 rounded-md border border-border bg-surface-2/60">
+                  <div className="flex items-center justify-between font-semibold text-foreground">
                     <span>State Surveillance Admin</span>
-                    <span className="text-primary text-[11px]">Super User</span>
+                    <span className="text-primary text-[11px] font-bold">Super User</span>
                   </div>
                   <p className="text-muted-foreground text-[11px] mt-0.5">TN Directorate of Public Health</p>
                 </li>
@@ -248,25 +252,25 @@ function AdminPage() {
 
             {/* System Diagnostics */}
             <section className="panel p-4">
-              <h2 className="label-eyebrow mb-3">System & Pipeline Diagnostics</h2>
+              <h2 className="label-eyebrow text-foreground mb-3">System & Pipeline Diagnostics</h2>
               <dl className="space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Database Sync</dt>
-                  <dd className="font-semibold text-safe">
+                <div className="flex justify-between border-b border-border pb-1.5">
+                  <dt className="text-muted-foreground font-medium">Database Sync</dt>
+                  <dd className="font-semibold text-emerald-700">
                     {isSupabaseConfigured ? "Supabase Cloud (PostgreSQL)" : "Local In-Memory Cache"}
                   </dd>
                 </div>
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">ML Inference Latency</dt>
-                  <dd className="font-mono text-foreground">42 ms</dd>
+                <div className="flex justify-between border-b border-border pb-1.5">
+                  <dt className="text-muted-foreground font-medium">ML Inference Latency</dt>
+                  <dd className="font-mono text-foreground font-semibold">42 ms</dd>
+                </div>
+                <div className="flex justify-between border-b border-border pb-1.5">
+                  <dt className="text-muted-foreground font-medium">Next Model Retraining</dt>
+                  <dd className="font-mono text-foreground font-semibold">Sunday, 00:00 UTC</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Next Model Retraining</dt>
-                  <dd className="font-mono text-foreground">Sunday, 00:00 UTC</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">GIS Boundary Shp</dt>
-                  <dd className="font-mono text-foreground">Thanjavur District (613 xxx)</dd>
+                  <dt className="text-muted-foreground font-medium">GIS Boundary Shapefile</dt>
+                  <dd className="font-mono text-foreground font-semibold">Thanjavur District (613 xxx)</dd>
                 </div>
               </dl>
             </section>

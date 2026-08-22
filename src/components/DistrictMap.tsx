@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { Zone } from "@/lib/grid-data";
+import { useTheme } from "@/lib/theme";
 import "leaflet/dist/leaflet.css";
 
 interface DistrictMapProps {
@@ -10,8 +11,10 @@ interface DistrictMapProps {
 }
 
 export function DistrictMap({ zones, phcs, selectedId, onSelectZone }: DistrictMapProps) {
+  const { theme } = useTheme();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<import("leaflet").Map | null>(null);
+  const tileLayerRef = useRef<import("leaflet").TileLayer | null>(null);
   const markersLayerRef = useRef<import("leaflet").LayerGroup | null>(null);
 
   // Initialize Map
@@ -40,11 +43,16 @@ export function DistrictMap({ zones, phcs, selectedId, onSelectZone }: DistrictM
       // Add zoom control in top-right
       L.control.zoom({ position: "topright" }).addTo(map);
 
-      // Add CartoDB Dark Matter tiles (matches the dark surveillance theme)
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      // Tile layer based on active theme
+      const tileUrl = theme === "dark"
+        ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+
+      const tileLayer = L.tileLayer(tileUrl, {
         maxZoom: 18,
         subdomains: "abcd",
       }).addTo(map);
+      tileLayerRef.current = tileLayer;
 
       const markersLayer = L.layerGroup().addTo(map);
       markersLayerRef.current = markersLayer;
@@ -63,6 +71,26 @@ export function DistrictMap({ zones, phcs, selectedId, onSelectZone }: DistrictM
     };
   }, []);
 
+  // Update tile layer when theme changes
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+    import("leaflet").then((L) => {
+      if (tileLayerRef.current && mapInstanceRef.current) {
+        tileLayerRef.current.remove();
+      }
+      const tileUrl = theme === "dark"
+        ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+
+      if (mapInstanceRef.current) {
+        tileLayerRef.current = L.tileLayer(tileUrl, {
+          maxZoom: 18,
+          subdomains: "abcd",
+        }).addTo(mapInstanceRef.current);
+      }
+    });
+  }, [theme]);
+
   // Update Markers when zones, phcs, or selectedId change
   useEffect(() => {
     if (!mapInstanceRef.current || !markersLayerRef.current) return;
@@ -75,14 +103,14 @@ export function DistrictMap({ zones, phcs, selectedId, onSelectZone }: DistrictM
   }, [zones, phcs, selectedId, onSelectZone]);
 
   return (
-    <div className="relative h-[520px] w-full overflow-hidden rounded-xl border border-border">
-      <div ref={mapContainerRef} className="h-full w-full bg-background/90" />
+    <div className="relative h-[520px] w-full overflow-hidden rounded-lg border border-border shadow-xs bg-slate-100">
+      <div ref={mapContainerRef} className="h-full w-full" />
       
       {/* Map Overlay Badge */}
-      <div className="pointer-events-none absolute bottom-3 left-3 z-[400] flex items-center gap-2 rounded-lg border border-border/80 bg-background/90 px-3 py-1.5 backdrop-blur">
+      <div className="pointer-events-none absolute bottom-3 left-3 z-[400] flex items-center gap-2.5 rounded-md border border-border bg-white/95 px-3 py-1.5 shadow-sm backdrop-blur">
         <span className="size-2 rounded-full bg-primary animate-pulse" />
-        <span className="text-[11px] font-medium text-foreground">
-          Thanjavur District GIS · Live Early Warning Grid
+        <span className="text-[11px] font-semibold text-foreground tracking-tight">
+          Thanjavur District Health GIS · Live Surveillance Map
         </span>
       </div>
     </div>
@@ -106,37 +134,36 @@ function renderMarkers(
     const isHigh = zone.risk === "high";
     const isWatch = zone.risk === "watch";
 
-    // Risk colors
-    const primaryColor = isHigh ? "oklch(0.65 0.24 25)" : isWatch ? "oklch(0.75 0.18 55)" : "oklch(0.72 0.19 145)";
-    const haloColor = isHigh ? "rgba(239, 68, 68, 0.25)" : isWatch ? "rgba(245, 158, 11, 0.2)" : "rgba(34, 197, 94, 0.15)";
+    // Risk colors (Clean healthcare palette)
+    const strokeColor = isHigh ? "#dc2626" : isWatch ? "#d97706" : "#16a34a";
+    const haloColor = isHigh ? "rgba(220, 38, 38, 0.18)" : isWatch ? "rgba(217, 119, 6, 0.15)" : "rgba(22, 163, 74, 0.1)";
 
     // Add disease cluster coverage radius circle for flagged areas
     if (isHigh || isWatch) {
       L.circle([zone.lat, zone.lng], {
         radius: isHigh ? 3800 : 2500,
-        color: primaryColor,
+        color: strokeColor,
         fillColor: haloColor,
         fillOpacity: isHigh ? 0.35 : 0.2,
-        weight: isHigh ? 1.5 : 1,
+        weight: isHigh ? 2 : 1.5,
         dashArray: isHigh ? undefined : "4, 4",
       })
         .on("click", () => onSelectZone(zone.id))
         .addTo(layer);
     }
 
-    // HTML custom marker icon
+    // HTML custom marker icon - Clean Government Badge
+    const bgClass = isHigh ? "bg-red-600 border-red-700 text-white" : isWatch ? "bg-amber-500 border-amber-600 text-white" : "bg-emerald-600 border-emerald-700 text-white";
+    const ringClass = isSelected ? "ring-3 ring-primary ring-offset-2 scale-105" : "hover:scale-105 shadow-sm";
+
     const html = `
-      <div class="relative cursor-pointer transition-transform duration-200 hover:scale-110 select-none">
-        ${isHigh ? `<span class="absolute -inset-2 rounded-full bg-red-500/40 animate-ping"></span>` : ""}
-        <div class="relative flex items-center gap-1.5 rounded-xl border ${
-          isSelected ? "ring-2 ring-white border-white scale-105" : "border-border/80"
-        } px-2.5 py-1.5 shadow-lg backdrop-blur" style="background-color: ${
-      isHigh ? "rgba(220, 38, 38, 0.88)" : isWatch ? "rgba(217, 119, 6, 0.88)" : "rgba(22, 101, 52, 0.85)"
-    };">
-          <span class="size-2 rounded-full bg-white"></span>
-          <div class="text-left leading-none">
-            <div class="text-[12px] font-bold text-white tracking-tight">${zone.name}</div>
-            <div class="text-[10px] text-white/85 font-medium mt-0.5">${zone.disease} (${zone.score})</div>
+      <div class="relative cursor-pointer transition-transform duration-150 select-none">
+        ${isHigh ? `<span class="absolute -inset-1.5 rounded-lg bg-red-400/40 animate-ping"></span>` : ""}
+        <div class="relative flex items-center gap-1.5 rounded-md border ${bgClass} ${ringClass} px-2.5 py-1 text-left shadow-md">
+          <span class="size-2 rounded-full bg-white flex-shrink-0"></span>
+          <div class="leading-none">
+            <div class="text-[11px] font-bold tracking-tight text-white">${zone.name}</div>
+            <div class="text-[10px] text-white/90 font-medium mt-0.5">${zone.disease} (${zone.score})</div>
           </div>
         </div>
       </div>
@@ -145,8 +172,8 @@ function renderMarkers(
     const icon = L.divIcon({
       className: "custom-map-zone-marker",
       html,
-      iconSize: [110, 36],
-      iconAnchor: [55, 18],
+      iconSize: [115, 34],
+      iconAnchor: [57, 17],
     });
 
     const marker = L.marker([zone.lat, zone.lng], { icon }).addTo(layer);
@@ -160,14 +187,14 @@ function renderMarkers(
     if (!phc.lat || !phc.lng) return;
 
     const isAvailable = phc.status === "available";
-    const statusColor = isAvailable ? "#22c55e" : phc.status === "partial" ? "#f59e0b" : "#ef4444";
+    const statusColor = isAvailable ? "#16a34a" : phc.status === "partial" ? "#d97706" : "#dc2626";
 
     const html = `
       <div class="group relative cursor-pointer select-none">
-        <div class="flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-900/90 px-2 py-1 shadow-md text-slate-200">
-          <span class="text-[10px] font-mono font-bold text-blue-400">🏥</span>
-          <span class="text-[11px] font-medium">${phc.name.replace("PHC ", "")}</span>
-          <span class="size-1.5 rounded-full ml-0.5" style="background-color: ${statusColor}"></span>
+        <div class="flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-2 py-1 shadow-sm text-slate-800 hover:border-primary">
+          <span class="text-[11px] font-bold text-blue-700">🏥</span>
+          <span class="text-[11px] font-bold text-slate-900">${phc.name.replace("PHC ", "")}</span>
+          <span class="size-2 rounded-full ml-0.5" style="background-color: ${statusColor}"></span>
         </div>
       </div>
     `;

@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { AppNav } from "@/components/AppNav";
 import { useAuth } from "@/lib/auth";
 import { usePharmacyData, useSubmitPharmacySales } from "@/hooks/useSurveillanceData";
-import { isSupabaseConfigured } from "@/lib/supabase";
 
 export const Route = createFileRoute("/pharmacy")({
   head: () => ({
@@ -12,12 +11,12 @@ export const Route = createFileRoute("/pharmacy")({
       {
         name: "description",
         content:
-          "Pharmacy owners review auto-imported daily medicine sales and submit them as early disease signals for their pincode.",
+          "Official pharmacy partner portal for daily OTC medicine sales telemetry reporting — Integrated Disease Surveillance Programme.",
       },
       { property: "og:title", content: "Pharmacy Portal — Jan Swasthya Signal Grid" },
       {
         property: "og:description",
-        content: "One-tap daily sales confirmation that feeds the district disease prediction model.",
+        content: "Daily OTC medicine sales confirmation feeding the district predictive disease grid.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -50,63 +49,76 @@ function Pharmacy() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <AppNav />
-      <main className="mx-auto max-w-[1500px] px-5 py-6">
-        <div className="grid gap-4 lg:grid-cols-[290px_minmax(0,1fr)_300px]">
-          <section className="panel p-4">
-            <h2 className="label-eyebrow">Pharmacy profile</h2>
-            <dl className="mt-3 space-y-3 text-sm">
-              {[
-                ["Owner name", "Rajan Krishnamurthy"],
-                ["Pharmacy name", "Sri Sai Medical Store"],
-                ["Pharmacy ID", "PH-TN-2204"],
-                ["GST number", "33AABCS1429B1ZB"],
-                ["District", "Thanjavur"],
-                ["Pincode", "613 001"],
-              ].map(([k, v]) => (
-                <div key={k}>
-                  <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">{k}</dt>
-                  <dd className="font-medium">{v}</dd>
-                </div>
-              ))}
-            </dl>
-            <div className="mt-5 rounded-xl border border-watch/50 bg-watch-soft p-3 text-center">
-              <p className="font-display text-3xl font-bold text-watch">12</p>
-              <p className="text-[11px] text-muted-foreground">Day submission streak</p>
+      <main className="mx-auto max-w-[1500px] px-4 py-5 sm:px-6">
+        <div className="grid gap-5 lg:grid-cols-[300px_minmax(0,1fr)_310px]">
+          {/* Left Column: Registered Pharmacy Profile */}
+          <section className="panel p-4 flex flex-col justify-between">
+            <div>
+              <div className="border-b border-border pb-3 mb-3">
+                <h2 className="label-eyebrow text-foreground">Pharmacy Profile</h2>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  IDSP Registered Data Partner
+                </p>
+              </div>
+
+              <dl className="space-y-3 text-xs">
+                {[
+                  ["License Holder", "Rajan Krishnamurthy"],
+                  ["Establishment", "Sri Sai Medical Store"],
+                  ["Partner ID", "PH-TN-2204"],
+                  ["GST Identification", "33AABCS1429B1ZB"],
+                  ["District Health Circle", "Thanjavur Circle"],
+                  ["Pincode", "613 001"],
+                ].map(([k, v]) => (
+                  <div key={k} className="border-b border-border/60 pb-2">
+                    <dt className="text-[10px] uppercase tracking-wide font-bold text-muted-foreground">{k}</dt>
+                    <dd className="font-semibold text-foreground mt-0.5">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
+            <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-3.5 text-center">
+              <p className="font-display text-3xl font-bold text-amber-800">12 Days</p>
+              <p className="text-[11px] font-semibold text-amber-800 mt-0.5">Continuous Compliance Streak</p>
             </div>
           </section>
 
+          {/* Center Column: Daily OTC Sales Telemetry */}
           <section className="panel p-4">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="label-eyebrow">Today's medicine sales — auto imported</h2>
-              <span className="rounded-full border border-safe/50 bg-safe-soft px-2.5 py-1 text-[11px] text-safe">
-                Auto synced
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3 mb-3">
+              <div>
+                <h2 className="label-eyebrow text-foreground">Today's OTC Medicine Sales — Auto Synced</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Imported from billing POS at 6:00 AM • 18 Category Summaries
+                </p>
+              </div>
+              <span className="rounded bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 text-[11px] font-semibold">
+                ✓ POS Auto Synced
               </span>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              CSV imported from billing system at 6:00 AM · 18 entries found
-            </p>
 
-            <div className="mt-4 overflow-hidden rounded-xl border border-border">
-              <table className="w-full text-sm">
-                <thead className="bg-surface-2 text-left text-[11px] uppercase tracking-wide text-muted-foreground">
+            <div className="overflow-hidden rounded-md border border-border mt-3">
+              <table className="w-full text-xs">
+                <thead className="bg-surface-2 text-left text-[10px] uppercase font-bold text-muted-foreground border-b border-border">
                   <tr>
-                    <th className="px-3 py-2 font-medium">#</th>
-                    <th className="px-3 py-2 font-medium">Medicine category</th>
-                    <th className="px-3 py-2 text-right font-medium">Qty sold</th>
-                    <th className="px-3 py-2 text-right font-medium">vs last week</th>
+                    <th className="px-3.5 py-2.5">#</th>
+                    <th className="px-3.5 py-2.5">Medicine Category</th>
+                    <th className="px-3.5 py-2.5 text-right">Units Sold</th>
+                    <th className="px-3.5 py-2.5 text-right">vs 7-Day Baseline</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-border bg-surface">
                   {salesRows.map((r, i) => (
-                    <tr key={r.cat} className="border-t border-border">
-                      <td className="px-3 py-2.5 text-muted-foreground">{i + 1}</td>
-                      <td className="px-3 py-2.5">{r.cat}</td>
-                      <td className="px-3 py-2.5 text-right font-mono">{r.qty} units</td>
+                    <tr key={r.cat} className="hover:bg-surface-2/60 transition-colors">
+                      <td className="px-3.5 py-2.5 text-muted-foreground font-mono">{i + 1}</td>
+                      <td className="px-3.5 py-2.5 font-semibold text-foreground">{r.cat}</td>
+                      <td className="px-3.5 py-2.5 text-right font-mono font-bold text-foreground">{r.qty} units</td>
                       <td
-                        className={`px-3 py-2.5 text-right font-mono ${
-                          r.delta >= 40 ? "text-high" : r.delta > 0 ? "text-watch" : "text-muted-foreground"
+                        className={`px-3.5 py-2.5 text-right font-mono font-bold ${
+                          r.delta >= 40 ? "text-red-600" : r.delta > 0 ? "text-amber-600" : "text-slate-500"
                         }`}
                       >
                         {r.delta > 0 ? "+" : ""}
@@ -121,33 +133,38 @@ function Pharmacy() {
             <button
               onClick={handleSubmit}
               disabled={submitted || submitSalesMutation.isPending}
-              className="mt-4 w-full rounded-xl bg-primary px-4 py-3 font-display text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+              className="mt-4 w-full rounded-md bg-primary px-4 py-3 font-display text-sm font-semibold text-primary-foreground shadow-xs hover:bg-primary/90 transition-all disabled:opacity-60 cursor-pointer"
             >
               {submitted
-                ? "Submitted · signals sent to district grid"
+                ? "✓ Submitted • Telemetry Sent to District Grid"
                 : submitSalesMutation.isPending
-                  ? "Submitting..."
-                  : "Confirm and submit today's data"}
+                  ? "Transmitting Data..."
+                  : "Confirm & Transmit Today's Sales Telemetry"}
             </button>
           </section>
 
+          {/* Right Column: 7-Day Audit Log */}
           <section className="panel p-4">
-            <h2 className="label-eyebrow">7-day submission log</h2>
-            <ul className="mt-3 space-y-2.5">
+            <div className="border-b border-border pb-3 mb-3">
+              <h2 className="label-eyebrow text-foreground">7-Day Transmission Audit Log</h2>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Verification status of daily telemetry</p>
+            </div>
+
+            <ul className="space-y-2.5">
               {submissionLog.map((d) => (
                 <li
                   key={d.date}
-                  className="flex items-center justify-between gap-2 rounded-xl border border-border bg-surface-2 px-3 py-2.5"
+                  className="flex items-center justify-between gap-2 rounded-md border border-border bg-surface-2/60 px-3 py-2.5"
                 >
                   <div>
-                    <p className="text-sm font-medium">{d.day}</p>
+                    <p className="text-xs font-bold text-foreground">{d.day}</p>
                     <p className="text-[11px] text-muted-foreground">
-                      {d.date} · {d.note}
+                      {d.date} • {d.note}
                     </p>
                   </div>
                   <span
                     className={`size-2.5 rounded-full ${
-                      d.state === "done" ? "bg-safe" : d.state === "missed" ? "bg-high" : "bg-watch"
+                      d.state === "done" ? "bg-emerald-500" : d.state === "missed" ? "bg-red-500" : "bg-amber-500"
                     }`}
                   />
                 </li>
