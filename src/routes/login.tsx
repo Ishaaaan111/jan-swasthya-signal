@@ -50,8 +50,8 @@ function LoginPage() {
         {/* Header Branding */}
         <div className="text-center mb-6">
           {/* Government Emblem */}
-          <div className="flex justify-center mb-3">
-            <div className="flex items-center justify-center size-20 rounded-xl bg-white border border-border p-2 shadow-xs">
+          <div className="flex justify-center mb-4">
+            <div className="flex items-center justify-center size-28 sm:size-32 rounded-2xl bg-white border border-border p-3 shadow-sm">
               <img
                 src="/logo.png"
                 alt="Government Emblem — Public Health Directorate"
