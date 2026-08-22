@@ -152,7 +152,7 @@ function Dashboard() {
             <div className="rounded-md border border-emerald-200 bg-emerald-50/70 p-3 text-left">
               <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">Active Mobile Camps</p>
               <p className="mt-1 text-lg font-bold font-display text-emerald-700">
-                {Object.keys(assigned).length + 5} Vans
+                {Object.keys(assigned).length + 5} Healthcare Camps
               </p>
               <p className="text-[10px] text-emerald-700 font-semibold mt-0.5">Deployed in District</p>
             </div>
@@ -337,7 +337,7 @@ function Dashboard() {
                             <div className="rounded-md border border-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 p-3 text-xs text-emerald-800 dark:text-emerald-200">
                               <p className="font-bold">✓ Mobile Camp Scheduled</p>
                               <p className="mt-0.5 text-[11px]">
-                                Assigned to <strong>{assigned[selected.id]}</strong>. Mobile health van rerouted for deployment.
+                                Assigned to <strong>{assigned[selected.id]}</strong>. Mobile Healthcare Camp scheduled for deployment.
                               </p>
                             </div>
                           ) : (
