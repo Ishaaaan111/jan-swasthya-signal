@@ -65,8 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // ignore
     }
-    // Default fallback to DHO session for smooth direct access if previously logged in
-    return ROLE_PRESETS.dho;
+    return null;
   });
 
   const [isLoading, setIsLoading] = useState(false);
