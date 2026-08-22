@@ -40,17 +40,17 @@ export function AppNav() {
             <span className="font-semibold uppercase tracking-wider">
               Government of Tamil Nadu
             </span>
-            <span className="text-white/40">|</span>
-            <span className="text-white/90">
+            <span className="opacity-40">|</span>
+            <span className="opacity-90 font-medium">
               Department of Public Health &amp; Preventive Medicine
             </span>
           </div>
-          <div className="hidden sm:flex items-center gap-4 text-white/80">
-            <span className="flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="hidden sm:flex items-center gap-4 opacity-90">
+            <span className="flex items-center gap-1.5 font-medium">
+              <span className="size-1.5 rounded-full bg-emerald-400 dark:bg-emerald-700 animate-pulse" />
               Integrated Disease Surveillance Programme (IDSP)
             </span>
-            <span>SIH 2026 Portal</span>
+            <span className="font-semibold">SIH 2026 Portal</span>
           </div>
         </div>
       </div>

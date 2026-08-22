@@ -80,9 +80,9 @@ function Pharmacy() {
               </dl>
             </div>
 
-            <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-3.5 text-center">
-              <p className="font-display text-3xl font-bold text-amber-800">12 Days</p>
-              <p className="text-[11px] font-semibold text-amber-800 mt-0.5">Continuous Compliance Streak</p>
+            <div className="mt-4 rounded-md border border-amber-200 dark:border-sky-800/60 bg-amber-50 dark:bg-sky-950/50 p-3.5 text-center">
+              <p className="font-display text-3xl font-bold text-amber-800 dark:text-sky-300">12 Days</p>
+              <p className="text-[11px] font-semibold text-amber-800 dark:text-sky-300 mt-0.5">Continuous Compliance Streak</p>
             </div>
           </section>
 
@@ -95,7 +95,7 @@ function Pharmacy() {
                   Imported from billing POS at 6:00 AM • 18 Category Summaries
                 </p>
               </div>
-              <span className="rounded bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 text-[11px] font-semibold">
+              <span className="rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 text-[11px] font-semibold">
                 ✓ POS Auto Synced
               </span>
             </div>
@@ -113,12 +113,12 @@ function Pharmacy() {
                 <tbody className="divide-y divide-border bg-surface">
                   {salesRows.map((r, i) => (
                     <tr key={r.cat} className="hover:bg-surface-2/60 transition-colors">
-                      <td className="px-3.5 py-2.5 text-muted-foreground font-mono">{i + 1}</td>
+                      <td className="px-3.5 py-2.5 text-muted-foreground font-mono font-medium">{i + 1}</td>
                       <td className="px-3.5 py-2.5 font-semibold text-foreground">{r.cat}</td>
-                      <td className="px-3.5 py-2.5 text-right font-mono font-bold text-foreground">{r.qty} units</td>
+                      <td className="px-3.5 py-2.5 text-right font-mono font-semibold text-foreground">{r.qty} units</td>
                       <td
-                        className={`px-3.5 py-2.5 text-right font-mono font-bold ${
-                          r.delta >= 40 ? "text-red-600" : r.delta > 0 ? "text-amber-600" : "text-slate-500"
+                        className={`px-3.5 py-2.5 text-right font-mono font-semibold ${
+                          r.delta >= 40 ? "text-red-600 dark:text-red-400" : r.delta > 0 ? "text-amber-600 dark:text-sky-300" : "text-muted-foreground"
                         }`}
                       >
                         {r.delta > 0 ? "+" : ""}
@@ -164,7 +164,7 @@ function Pharmacy() {
                   </div>
                   <span
                     className={`size-2.5 rounded-full ${
-                      d.state === "done" ? "bg-emerald-500" : d.state === "missed" ? "bg-red-500" : "bg-amber-500"
+                      d.state === "done" ? "bg-emerald-500" : d.state === "missed" ? "bg-red-500" : "bg-amber-500 dark:bg-sky-400"
                     }`}
                   />
                 </li>

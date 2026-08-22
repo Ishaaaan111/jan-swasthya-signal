@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import type { Zone } from "@/lib/grid-data";
-import { useTheme } from "@/lib/theme";
 import "leaflet/dist/leaflet.css";
 
 interface DistrictMapProps {
@@ -11,13 +10,12 @@ interface DistrictMapProps {
 }
 
 export function DistrictMap({ zones, phcs, selectedId, onSelectZone }: DistrictMapProps) {
-  const { theme } = useTheme();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<import("leaflet").Map | null>(null);
   const tileLayerRef = useRef<import("leaflet").TileLayer | null>(null);
   const markersLayerRef = useRef<import("leaflet").LayerGroup | null>(null);
 
-  // Initialize Map
+  // Initialize Map (Always Light Theme)
   useEffect(() => {
     if (typeof window === "undefined" || !mapContainerRef.current) return;
 
@@ -43,10 +41,8 @@ export function DistrictMap({ zones, phcs, selectedId, onSelectZone }: DistrictM
       // Add zoom control in top-right
       L.control.zoom({ position: "topright" }).addTo(map);
 
-      // Tile layer based on active theme
-      const tileUrl = theme === "dark"
-        ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+      // Light tile layer (CartoDB Voyager light map)
+      const tileUrl = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
 
       const tileLayer = L.tileLayer(tileUrl, {
         maxZoom: 18,
@@ -70,26 +66,6 @@ export function DistrictMap({ zones, phcs, selectedId, onSelectZone }: DistrictM
       }
     };
   }, []);
-
-  // Update tile layer when theme changes
-  useEffect(() => {
-    if (!mapInstanceRef.current) return;
-    import("leaflet").then((L) => {
-      if (tileLayerRef.current && mapInstanceRef.current) {
-        tileLayerRef.current.remove();
-      }
-      const tileUrl = theme === "dark"
-        ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
-
-      if (mapInstanceRef.current) {
-        tileLayerRef.current = L.tileLayer(tileUrl, {
-          maxZoom: 18,
-          subdomains: "abcd",
-        }).addTo(mapInstanceRef.current);
-      }
-    });
-  }, [theme]);
 
   // Update Markers when zones, phcs, or selectedId change
   useEffect(() => {
@@ -162,8 +138,8 @@ function renderMarkers(
         <div class="relative flex items-center gap-1.5 rounded-md border ${bgClass} ${ringClass} px-2.5 py-1 text-left shadow-md">
           <span class="size-2 rounded-full bg-white flex-shrink-0"></span>
           <div class="leading-none">
-            <div class="text-[11px] font-bold tracking-tight text-white">${zone.name}</div>
-            <div class="text-[10px] text-white/90 font-medium mt-0.5">${zone.disease} (${zone.score})</div>
+            <div class="text-[11px] font-extrabold tracking-tight text-white drop-shadow-xs">${zone.name}</div>
+            <div class="text-[10.5px] font-extrabold text-white tracking-wide mt-0.5 drop-shadow-xs">${zone.disease} (${zone.score})</div>
           </div>
         </div>
       </div>

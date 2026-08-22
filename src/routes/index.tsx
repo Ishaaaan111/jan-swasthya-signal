@@ -198,7 +198,9 @@ function Dashboard() {
                     </span>
                   </div>
                   <div className="mt-1.5 flex items-center justify-between text-xs">
-                    <span className="font-semibold text-slate-700">{a.tag}</span>
+                    <span className="font-bold text-blue-950 bg-blue-100 dark:bg-blue-950/90 dark:text-blue-200 border border-blue-300 dark:border-blue-700 px-2 py-0.5 rounded text-[11px] shadow-2xs">
+                      {a.tag}
+                    </span>
                   </div>
                   <p className="mt-1.5 text-xs text-muted-foreground bg-surface-2 p-2 rounded border border-border/60">
                     {a.note}
@@ -224,7 +226,7 @@ function Dashboard() {
                   <Legend color="bg-amber-500" label="Watch Zone" />
                   <Legend color="bg-emerald-600" label="Normal" />
                   <span className="inline-flex items-center gap-1">
-                    <span className="text-blue-600 font-bold">🏥</span> PHC
+                    <span className="text-blue-600 dark:text-blue-400 font-bold">🏥</span> PHC
                   </span>
                 </div>
               </div>
@@ -240,11 +242,11 @@ function Dashboard() {
 
                 {/* Selected Location Medical Analysis Panel */}
                 {selected && (
-                  <aside className="absolute top-3 right-3 bottom-3 z-[500] w-[310px] overflow-y-auto rounded-lg border border-border bg-white p-4 shadow-xl text-slate-900 border-l-4 border-l-primary">
-                    <div className="flex items-start justify-between gap-2 border-b border-slate-200 pb-3">
+                  <aside className="absolute top-3 right-3 bottom-3 z-[500] w-[310px] overflow-y-auto rounded-lg border border-border bg-white dark:bg-slate-900 p-4 shadow-xl text-slate-900 dark:text-slate-100 border-l-4 border-l-primary">
+                    <div className="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-700 pb-3">
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <h3 className="font-display text-base font-bold text-slate-900">{selected.name}</h3>
+                          <h3 className="font-display text-base font-bold text-slate-900 dark:text-slate-100">{selected.name}</h3>
                           <span
                             className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white ${
                               selected.risk === "high"
@@ -257,14 +259,14 @@ function Dashboard() {
                             {selected.risk}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-600 mt-0.5">
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
                           Pincode <strong className="font-mono">{selected.pincode}</strong> • Pop. {selected.population}
                         </p>
                       </div>
                       <button
                         onClick={() => setSelectedId(null)}
                         aria-label="Close panel"
-                        className="rounded-md border border-slate-200 px-2 py-0.5 text-xs text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                        className="rounded-md border border-slate-200 dark:border-slate-700 px-2 py-0.5 text-xs text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
                       >
                         ✕
                       </button>
@@ -272,44 +274,46 @@ function Dashboard() {
 
                     {/* Risk Score & Diagnosis Specs */}
                     <div className="mt-3.5 space-y-2.5">
-                      <div className="rounded-md bg-slate-50 p-2.5 border border-slate-200">
+                      <div className="rounded-md bg-slate-50 dark:bg-slate-800/80 p-2.5 border border-slate-200 dark:border-slate-700">
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-slate-500 font-medium">Predicted Condition</span>
-                          <span className="font-bold text-slate-900">{selected.disease}</span>
+                          <span className="text-slate-600 dark:text-slate-300 font-medium">Predicted Condition</span>
+                          <span className="font-bold text-blue-950 bg-blue-100 dark:bg-blue-950/90 dark:text-blue-200 border border-blue-300 dark:border-blue-700 px-2 py-0.5 rounded text-[11px] shadow-2xs">
+                            {selected.disease}
+                          </span>
                         </div>
-                        <div className="flex items-center justify-between text-xs mt-1">
-                          <span className="text-slate-500 font-medium">Risk Score</span>
+                        <div className="flex items-center justify-between text-xs mt-1.5">
+                          <span className="text-slate-600 dark:text-slate-300 font-medium">Risk Score</span>
                           <span
                             className={`font-bold font-mono ${
                               selected.risk === "high"
-                                ? "text-red-600 text-sm"
+                                ? "text-red-600 dark:text-red-400 text-sm"
                                 : selected.risk === "watch"
-                                  ? "text-amber-600"
-                                  : "text-emerald-600"
+                                  ? "text-amber-600 dark:text-amber-400"
+                                  : "text-emerald-600 dark:text-emerald-400"
                             }`}
                           >
                             {selected.score} / 100
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-xs mt-1">
-                          <span className="text-slate-500 font-medium">ML Model Confidence</span>
-                          <span className="font-semibold text-slate-800">{selected.confidence}%</span>
+                          <span className="text-slate-600 dark:text-slate-300 font-medium">ML Model Confidence</span>
+                          <span className="font-bold text-slate-800 dark:text-slate-200">{selected.confidence}%</span>
                         </div>
                       </div>
 
                       {/* Signals breakdown */}
                       <div>
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                           Why It Was Flagged (Signals)
                         </p>
                         <ul className="space-y-2">
                           {selected.signals.map((s) => (
-                            <li key={s.label} className="rounded bg-slate-50 p-2 border border-slate-200">
+                            <li key={s.label} className="rounded bg-slate-50 dark:bg-slate-800/80 p-2 border border-slate-200 dark:border-slate-700">
                               <div className="flex justify-between gap-2 text-xs">
-                                <span className="text-slate-800 font-medium">{s.label}</span>
-                                <span className="font-mono font-bold text-slate-900">{s.delta}</span>
+                                <span className="text-slate-800 dark:text-slate-200 font-medium">{s.label}</span>
+                                <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{s.delta}</span>
                               </div>
-                              <div className="mt-1.5 h-1.5 w-full rounded-full bg-slate-200 overflow-hidden">
+                              <div className="mt-1.5 h-1.5 w-full rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
                                 <div
                                   className={`h-full rounded-full ${
                                     selected.risk === "high"
@@ -328,9 +332,9 @@ function Dashboard() {
 
                       {/* Actionable Deployment / Camp Assignment */}
                       {selected.risk !== "normal" && (
-                        <div className="mt-4 pt-3 border-t border-slate-200">
+                        <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700">
                           {assigned[selected.id] ? (
-                            <div className="rounded-md border border-emerald-300 bg-emerald-50 p-3 text-xs text-emerald-800">
+                            <div className="rounded-md border border-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 p-3 text-xs text-emerald-800 dark:text-emerald-200">
                               <p className="font-bold">✓ Mobile Camp Scheduled</p>
                               <p className="mt-0.5 text-[11px]">
                                 Assigned to <strong>{assigned[selected.id]}</strong>. Mobile health van rerouted for deployment.
@@ -339,10 +343,10 @@ function Dashboard() {
                           ) : (
                             <>
                               <div className="flex items-center justify-between mb-2">
-                                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-700">
+                                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                                   Schedule Mobile Camp
                                 </p>
-                                <span className="text-[10px] text-slate-500">Select Nearest PHC</span>
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400">Select Nearest PHC</span>
                               </div>
                               <div className="space-y-1.5">
                                 {phcs
@@ -352,10 +356,10 @@ function Dashboard() {
                                     <button
                                       key={p.name}
                                       onClick={() => handleAssignCamp(selected.id, p.name)}
-                                      className="flex w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 hover:border-primary hover:bg-primary/5 transition-all shadow-xs"
+                                      className="flex w-full items-center justify-between rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 hover:border-primary hover:bg-primary/5 transition-all shadow-xs"
                                     >
                                       <span>Dispatch {p.name}</span>
-                                      <span className="text-slate-500 font-mono text-[11px]">{p.km} km</span>
+                                      <span className="text-slate-500 dark:text-slate-400 font-mono text-[11px]">{p.km} km</span>
                                     </button>
                                   ))}
                               </div>
