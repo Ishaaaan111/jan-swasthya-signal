@@ -2,9 +2,12 @@ import { useMemo, useState, useEffect } from "react";
 import { useNavigate, createFileRoute } from "@tanstack/react-router";
 import { AppNav } from "@/components/AppNav";
 import { DistrictMap } from "@/components/DistrictMap";
+import { MobileCampDeployments } from "@/components/MobileCampDeployments";
+import { ModelAccuracyTracker } from "@/components/ModelAccuracyTracker";
 import { useAuth } from "@/lib/auth";
 import { useZones, useAlertHistory, usePhcList, useAssignCamp } from "@/hooks/useSurveillanceData";
 import { isSupabaseConfigured } from "@/lib/supabase";
+import { Activity, Truck, Award } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -55,6 +58,7 @@ function Dashboard() {
   const { data: phcs = [] } = usePhcList();
   const assignCampMutation = useAssignCamp();
 
+  const [activeTab, setActiveTab] = useState<"map" | "camps" | "accuracy">("map");
   const [selectedId, setSelectedId] = useState<string | null>("pattukkottai");
   const [assigned, setAssigned] = useState<Record<string, string>>({});
   const selected = useMemo(() => zones.find((z) => z.id === selectedId) ?? null, [zones, selectedId]);
@@ -79,9 +83,9 @@ function Dashboard() {
     <div className="min-h-screen bg-background">
       <AppNav />
 
-      <main className="mx-auto max-w-[1500px] px-4 py-5 sm:px-6">
+      <main className="mx-auto max-w-[1500px] px-4 py-5 sm:px-6 space-y-5">
         {/* District Overview Header */}
-        <div className="mb-5 rounded-lg border border-border bg-surface p-4 sm:p-5 shadow-xs">
+        <div className="rounded-lg border border-border bg-surface p-4 sm:p-5 shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-3.5 mb-4">
             <div>
               <div className="flex items-center gap-2">
@@ -91,7 +95,7 @@ function Dashboard() {
                 <span className="text-xs text-muted-foreground">District Administration • Thanjavur</span>
               </div>
               <h1 className="mt-1 text-xl font-bold font-display tracking-tight text-foreground sm:text-2xl">
-                District Disease Surveillance Overview
+                District Disease Surveillance & Mobile Healthcare Dispatch
               </h1>
             </div>
 
@@ -152,7 +156,7 @@ function Dashboard() {
             <div className="rounded-md border border-emerald-200 bg-emerald-50/70 p-3 text-left">
               <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">Active Mobile Camps</p>
               <p className="mt-1 text-lg font-bold font-display text-emerald-700">
-                {Object.keys(assigned).length + 5} Healthcare Camps
+                {Object.keys(assigned).length + 3} Field Units
               </p>
               <p className="text-[10px] text-emerald-700 font-semibold mt-0.5">Deployed in District</p>
             </div>
@@ -165,268 +169,322 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Dashboard 3-Column Main Grid */}
-        <div className="grid gap-5 lg:grid-cols-[310px_minmax(0,1fr)_320px]">
-          {/* Left Column: Official Health Alert History */}
-          <section className="panel p-4 flex flex-col">
-            <div className="flex items-center justify-between border-b border-border pb-3 mb-3">
-              <div>
-                <h2 className="label-eyebrow text-foreground">Alert History</h2>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
-                  Official District Health Warnings
-                </p>
-              </div>
-              <span className="rounded bg-surface-2 border border-border px-2 py-0.5 text-[10px] font-mono text-muted-foreground">
-                {alertHistory.length} Logged
-              </span>
-            </div>
+        {/* Feature Navigation Tabs */}
+        <div className="flex items-center gap-2 border-b border-border pb-1">
+          <button
+            onClick={() => setActiveTab("map")}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-bold text-xs transition ${
+              activeTab === "map"
+                ? "bg-surface-2 border border-border text-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface-2/60"
+            }`}
+          >
+            <Activity className="size-4 text-primary" />
+            <span>District Surveillance & GIS Map</span>
+          </button>
 
-            <ul className="space-y-3 overflow-y-auto max-h-[640px] pr-1">
-              {alertHistory.map((a) => (
-                <li
-                  key={a.zone}
-                  className="rounded-md border border-border bg-surface p-3 transition-all hover:border-primary/40 shadow-xs"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-display text-sm font-bold text-foreground">{a.zone}</span>
-                    <span
-                      className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide border ${
-                        badgeTone[a.tone as keyof typeof badgeTone] || badgeTone.normal
-                      }`}
-                    >
-                      {a.tone === "high" ? "High Risk" : a.tone === "watch" ? "Watch" : "Normal"}
-                    </span>
-                  </div>
-                  <div className="mt-1.5 flex items-center justify-between text-xs">
-                    <span className="font-bold text-blue-950 bg-blue-100 dark:bg-blue-950/90 dark:text-blue-200 border border-blue-300 dark:border-blue-700 px-2 py-0.5 rounded text-[11px] shadow-2xs">
-                      {a.tag}
-                    </span>
-                  </div>
-                  <p className="mt-1.5 text-xs text-muted-foreground bg-surface-2 p-2 rounded border border-border/60">
-                    {a.note}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </section>
+          <button
+            onClick={() => setActiveTab("camps")}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-bold text-xs transition relative ${
+              activeTab === "camps"
+                ? "bg-surface-2 border border-border text-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface-2/60"
+            }`}
+          >
+            <Truck className="size-4 text-amber-600 dark:text-amber-400" />
+            <span>Mobile Healthcare Camps</span>
+            <span className="rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 font-mono text-[10px] px-1.5 py-0.2 border border-amber-500/30">
+              {Object.keys(assigned).length + 3}
+            </span>
+          </button>
 
-          {/* Center Column: District GIS Risk Map */}
-          <section className="panel relative p-4 flex flex-col justify-between">
-            <div>
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3 mb-3">
+          <button
+            onClick={() => setActiveTab("accuracy")}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-bold text-xs transition ${
+              activeTab === "accuracy"
+                ? "bg-surface-2 border border-border text-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface-2/60"
+            }`}
+          >
+            <Award className="size-4 text-emerald-600 dark:text-emerald-400" />
+            <span>ML Accuracy & Retraining (89.4%)</span>
+          </button>
+        </div>
+
+        {/* TAB 1: District GIS Map & Surveillance */}
+        {activeTab === "map" && (
+          <div className="grid gap-5 lg:grid-cols-[310px_minmax(0,1fr)_320px]">
+            {/* Left Column: Official Health Alert History */}
+            <section className="panel p-4 flex flex-col">
+              <div className="flex items-center justify-between border-b border-border pb-3 mb-3">
                 <div>
-                  <h2 className="label-eyebrow text-foreground">GIS Risk Map — Thanjavur District</h2>
-                  <p className="text-[11px] text-muted-foreground">
-                    Interactive Pincode Disease Cluster Map
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3 text-[11px] font-medium text-muted-foreground bg-surface-2 px-2.5 py-1 rounded border border-border">
-                  <Legend color="bg-red-600" label="High Risk" />
-                  <Legend color="bg-amber-500" label="Watch Zone" />
-                  <Legend color="bg-emerald-600" label="Normal" />
-                  <span className="inline-flex items-center gap-1">
-                    <span className="text-blue-600 dark:text-blue-400 font-bold">🏥</span> PHC
-                  </span>
-                </div>
-              </div>
-
-              {/* Leaflet Map Area */}
-              <div className="relative">
-                <DistrictMap
-                  zones={zones}
-                  phcs={phcs}
-                  selectedId={selectedId}
-                  onSelectZone={(id) => setSelectedId(id)}
-                />
-
-                {/* Selected Location Medical Analysis Panel */}
-                {selected && (
-                  <aside className="absolute top-3 right-3 bottom-3 z-[500] w-[310px] overflow-y-auto rounded-lg border border-border bg-white dark:bg-slate-900 p-4 shadow-xl text-slate-900 dark:text-slate-100 border-l-4 border-l-primary">
-                    <div className="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-700 pb-3">
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <h3 className="font-display text-base font-bold text-slate-900 dark:text-slate-100">{selected.name}</h3>
-                          <span
-                            className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white ${
-                              selected.risk === "high"
-                                ? "bg-red-600"
-                                : selected.risk === "watch"
-                                  ? "bg-amber-600"
-                                  : "bg-emerald-600"
-                            }`}
-                          >
-                            {selected.risk}
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                          Pincode <strong className="font-mono">{selected.pincode}</strong> • Pop. {selected.population}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => setSelectedId(null)}
-                        aria-label="Close panel"
-                        className="rounded-md border border-slate-200 dark:border-slate-700 px-2 py-0.5 text-xs text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
-                      >
-                        ✕
-                      </button>
-                    </div>
-
-                    {/* Risk Score & Diagnosis Specs */}
-                    <div className="mt-3.5 space-y-2.5">
-                      <div className="rounded-md bg-slate-50 dark:bg-slate-800/80 p-2.5 border border-slate-200 dark:border-slate-700">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-slate-600 dark:text-slate-300 font-medium">Predicted Condition</span>
-                          <span className="font-bold text-blue-950 bg-blue-100 dark:bg-blue-950/90 dark:text-blue-200 border border-blue-300 dark:border-blue-700 px-2 py-0.5 rounded text-[11px] shadow-2xs">
-                            {selected.disease}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs mt-1.5">
-                          <span className="text-slate-600 dark:text-slate-300 font-medium">Risk Score</span>
-                          <span
-                            className={`font-bold font-mono ${
-                              selected.risk === "high"
-                                ? "text-red-600 dark:text-red-400 text-sm"
-                                : selected.risk === "watch"
-                                  ? "text-amber-600 dark:text-amber-400"
-                                  : "text-emerald-600 dark:text-emerald-400"
-                            }`}
-                          >
-                            {selected.score} / 100
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs mt-1">
-                          <span className="text-slate-600 dark:text-slate-300 font-medium">ML Model Confidence</span>
-                          <span className="font-bold text-slate-800 dark:text-slate-200">{selected.confidence}%</span>
-                        </div>
-                      </div>
-
-                      {/* Signals breakdown */}
-                      <div>
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
-                          Why It Was Flagged (Signals)
-                        </p>
-                        <ul className="space-y-2">
-                          {selected.signals.map((s) => (
-                            <li key={s.label} className="rounded bg-slate-50 dark:bg-slate-800/80 p-2 border border-slate-200 dark:border-slate-700">
-                              <div className="flex justify-between gap-2 text-xs">
-                                <span className="text-slate-800 dark:text-slate-200 font-medium">{s.label}</span>
-                                <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{s.delta}</span>
-                              </div>
-                              <div className="mt-1.5 h-1.5 w-full rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
-                                <div
-                                  className={`h-full rounded-full ${
-                                    selected.risk === "high"
-                                      ? "bg-red-600"
-                                      : selected.risk === "watch"
-                                        ? "bg-amber-500"
-                                        : "bg-emerald-500"
-                                  }`}
-                                  style={{ width: `${s.weight}%` }}
-                                />
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      {/* Actionable Deployment / Camp Assignment */}
-                      {selected.risk !== "normal" && (
-                        <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700">
-                          {assigned[selected.id] ? (
-                            <div className="rounded-md border border-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 p-3 text-xs text-emerald-800 dark:text-emerald-200">
-                              <p className="font-bold">✓ Mobile Camp Scheduled</p>
-                              <p className="mt-0.5 text-[11px]">
-                                Assigned to <strong>{assigned[selected.id]}</strong>. Mobile Healthcare Camp scheduled for deployment.
-                              </p>
-                            </div>
-                          ) : (
-                            <>
-                              <div className="flex items-center justify-between mb-2">
-                                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                                  Schedule Mobile Camp
-                                </p>
-                                <span className="text-[10px] text-slate-500 dark:text-slate-400">Select Nearest PHC</span>
-                              </div>
-                              <div className="space-y-1.5">
-                                {phcs
-                                  .filter((p) => p.status !== "occupied")
-                                  .slice(0, 3)
-                                  .map((p) => (
-                                    <button
-                                      key={p.name}
-                                      onClick={() => handleAssignCamp(selected.id, p.name)}
-                                      className="flex w-full items-center justify-between rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 hover:border-primary hover:bg-primary/5 transition-all shadow-xs"
-                                    >
-                                      <span>Dispatch {p.name}</span>
-                                      <span className="text-slate-500 dark:text-slate-400 font-mono text-[11px]">{p.km} km</span>
-                                    </button>
-                                  ))}
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </aside>
-                )}
-              </div>
-            </div>
-          </section>
-
-          {/* Right Column: PHC Availability & Camp Workflow */}
-          <div className="space-y-4">
-            {/* Primary Health Centre Availability */}
-            <section className="panel p-4">
-              <div className="flex items-center justify-between border-b border-border pb-2.5 mb-3">
-                <div>
-                  <h2 className="label-eyebrow text-foreground">PHC Availability</h2>
+                  <h2 className="label-eyebrow text-foreground">Alert History</h2>
                   <p className="text-[11px] text-muted-foreground mt-0.5">
-                    District Mobile Fleet Capacity
+                    Official District Health Warnings
                   </p>
                 </div>
-                <span className="rounded bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 text-[10px] font-semibold">
-                  5 Field Units
+                <span className="rounded bg-surface-2 border border-border px-2 py-0.5 text-[10px] font-mono text-muted-foreground">
+                  {alertHistory.length} Logged
                 </span>
               </div>
 
-              <ul className="space-y-2.5">
-                {phcs.map((p) => (
+              <ul className="space-y-3 overflow-y-auto max-h-[640px] pr-1">
+                {alertHistory.map((a) => (
                   <li
-                    key={p.name}
-                    className="flex items-center justify-between gap-2 rounded-md border border-border bg-surface-2/60 p-2.5 text-xs"
+                    key={a.zone}
+                    className="rounded-md border border-border bg-surface p-3 transition-all hover:border-primary/40 shadow-xs"
                   >
-                    <div>
-                      <p className="font-semibold text-foreground">{p.name}</p>
-                      <p className="text-[11px] text-muted-foreground font-mono">{p.km} km from district HQ</p>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className={`size-2.5 rounded-full ${statusDot[p.status]}`} />
-                      <span className="text-[10px] font-semibold capitalize text-muted-foreground">
-                        {p.status}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-display text-sm font-bold text-foreground">{a.zone}</span>
+                      <span
+                        className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide border ${
+                          badgeTone[a.tone as keyof typeof badgeTone] || badgeTone.normal
+                        }`}
+                      >
+                        {a.tone === "high" ? "High Risk" : a.tone === "watch" ? "Watch" : "Normal"}
                       </span>
                     </div>
+                    <div className="mt-1.5 flex items-center justify-between text-xs">
+                      <span className="font-bold text-blue-950 bg-blue-100 dark:bg-blue-950/90 dark:text-blue-200 border border-blue-300 dark:border-blue-700 px-2 py-0.5 rounded text-[11px] shadow-2xs">
+                        {a.tag}
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-xs text-muted-foreground bg-surface-2 p-2 rounded border border-border/60">
+                      {a.note}
+                    </p>
                   </li>
                 ))}
               </ul>
+            </section>
 
-              <div className="mt-3.5 flex items-center justify-around border-t border-border pt-2.5 text-[11px] text-muted-foreground">
-                <Legend color="bg-emerald-500" label="Available" />
-                <Legend color="bg-amber-500" label="Partial" />
-                <Legend color="bg-red-500" label="Deployed" />
+            {/* Center Column: District GIS Risk Map */}
+            <section className="panel relative p-4 flex flex-col justify-between">
+              <div>
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3 mb-3">
+                  <div>
+                    <h2 className="label-eyebrow text-foreground">GIS Risk Map — Thanjavur District</h2>
+                    <p className="text-[11px] text-muted-foreground">
+                      Interactive Pincode Disease Cluster Map
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3 text-[11px] font-medium text-muted-foreground bg-surface-2 px-2.5 py-1 rounded border border-border">
+                    <Legend color="bg-red-600" label="High Risk" />
+                    <Legend color="bg-amber-500" label="Watch Zone" />
+                    <Legend color="bg-emerald-600" label="Normal" />
+                    <span className="inline-flex items-center gap-1">
+                      <span className="text-blue-600 dark:text-blue-400 font-bold">🏥</span> PHC
+                    </span>
+                  </div>
+                </div>
+
+                {/* Leaflet Map Area */}
+                <div className="relative">
+                  <DistrictMap
+                    zones={zones}
+                    phcs={phcs}
+                    selectedId={selectedId}
+                    onSelectZone={(id) => setSelectedId(id)}
+                  />
+
+                  {/* Selected Location Medical Analysis Panel */}
+                  {selected && (
+                    <aside className="absolute top-3 right-3 bottom-3 z-[500] w-[310px] overflow-y-auto rounded-lg border border-border bg-white dark:bg-slate-900 p-4 shadow-xl text-slate-900 dark:text-slate-100 border-l-4 border-l-primary">
+                      <div className="flex items-start justify-between gap-2 border-b border-slate-200 dark:border-slate-700 pb-3">
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <h3 className="font-display text-base font-bold text-slate-900 dark:text-slate-100">{selected.name}</h3>
+                            <span
+                              className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white ${
+                                selected.risk === "high"
+                                  ? "bg-red-600"
+                                  : selected.risk === "watch"
+                                    ? "bg-amber-600"
+                                    : "bg-emerald-600"
+                              }`}
+                            >
+                              {selected.risk}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                            Pincode <strong className="font-mono">{selected.pincode}</strong> • Pop. {selected.population}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setSelectedId(null)}
+                          aria-label="Close panel"
+                          className="rounded-md border border-slate-200 dark:border-slate-700 px-2 py-0.5 text-xs text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      {/* Risk Score & Diagnosis Specs */}
+                      <div className="mt-3.5 space-y-2.5">
+                        <div className="rounded-md bg-slate-50 dark:bg-slate-800/80 p-2.5 border border-slate-200 dark:border-slate-700">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-slate-600 dark:text-slate-300 font-medium">Predicted Condition</span>
+                            <span className="font-bold text-blue-950 bg-blue-100 dark:bg-blue-950/90 dark:text-blue-200 border border-blue-300 dark:border-blue-700 px-2 py-0.5 rounded text-[11px] shadow-2xs">
+                              {selected.disease}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs mt-1.5">
+                            <span className="text-slate-600 dark:text-slate-300 font-medium">Risk Score</span>
+                            <span
+                              className={`font-bold font-mono ${
+                                selected.risk === "high"
+                                  ? "text-red-600 dark:text-red-400 text-sm"
+                                  : selected.risk === "watch"
+                                    ? "text-amber-600 dark:text-amber-400"
+                                    : "text-emerald-600 dark:text-emerald-400"
+                              }`}
+                            >
+                              {selected.score} / 100
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs mt-1">
+                            <span className="text-slate-600 dark:text-slate-300 font-medium">ML Model Confidence</span>
+                            <span className="font-bold text-slate-800 dark:text-slate-200">{selected.confidence}%</span>
+                          </div>
+                        </div>
+
+                        {/* Signals breakdown */}
+                        <div>
+                          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                            Why It Was Flagged (Signals)
+                          </p>
+                          <ul className="space-y-2">
+                            {selected.signals.map((s) => (
+                              <li key={s.label} className="rounded bg-slate-50 dark:bg-slate-800/80 p-2 border border-slate-200 dark:border-slate-700">
+                                <div className="flex justify-between gap-2 text-xs">
+                                  <span className="text-slate-800 dark:text-slate-200 font-medium">{s.label}</span>
+                                  <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{s.delta}</span>
+                                </div>
+                                <div className="mt-1.5 h-1.5 w-full rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                                  <div
+                                    className={`h-full rounded-full ${
+                                      selected.risk === "high"
+                                        ? "bg-red-600"
+                                        : selected.risk === "watch"
+                                          ? "bg-amber-500"
+                                          : "bg-emerald-500"
+                                    }`}
+                                    style={{ width: `${s.weight}%` }}
+                                  />
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {/* Actionable Deployment / Camp Assignment */}
+                        {selected.risk !== "normal" && (
+                          <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700">
+                            {assigned[selected.id] ? (
+                              <div className="rounded-md border border-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 p-3 text-xs text-emerald-800 dark:text-emerald-200">
+                                <p className="font-bold">✓ Mobile Camp Scheduled</p>
+                                <p className="mt-0.5 text-[11px]">
+                                  Assigned to <strong>{assigned[selected.id]}</strong>. Mobile Healthcare Camp scheduled for deployment.
+                                </p>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="flex items-center justify-between mb-2">
+                                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                    Schedule Mobile Camp
+                                  </p>
+                                  <span className="text-[10px] text-slate-500 dark:text-slate-400">Select Nearest PHC</span>
+                                </div>
+                                <div className="space-y-1.5">
+                                  {phcs
+                                    .filter((p) => p.status !== "occupied")
+                                    .slice(0, 3)
+                                    .map((p) => (
+                                      <button
+                                        key={p.name}
+                                        onClick={() => handleAssignCamp(selected.id, p.name)}
+                                        className="flex w-full items-center justify-between rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 hover:border-primary hover:bg-primary/5 transition-all shadow-xs"
+                                      >
+                                        <span>Dispatch {p.name}</span>
+                                        <span className="text-slate-500 dark:text-slate-400 font-mono text-[11px]">{p.km} km</span>
+                                      </button>
+                                    ))}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </aside>
+                  )}
+                </div>
               </div>
             </section>
 
-            {/* Camp Outcomes & Training Feedback Loop */}
-            <section className="panel p-4">
-              <h2 className="label-eyebrow text-foreground mb-2">Model Feedback Loop</h2>
-              <div className="rounded-md border border-border bg-surface-2 p-3 text-xs leading-relaxed text-muted-foreground">
-                <p className="font-semibold text-foreground mb-1">Weekly Retraining Progress</p>
-                Last cycle 5 mobile screening camps tested <strong className="text-foreground">412 citizens</strong> and confirmed <strong className="text-foreground">59 cases</strong>. Those verified lab results were pushed back into the model, improving prediction accuracy from 84% to <strong className="text-primary font-bold">89.4%</strong>.
-              </div>
-            </section>
+            {/* Right Column: PHC Availability & Camp Workflow */}
+            <div className="space-y-4">
+              {/* Primary Health Centre Availability */}
+              <section className="panel p-4">
+                <div className="flex items-center justify-between border-b border-border pb-2.5 mb-3">
+                  <div>
+                    <h2 className="label-eyebrow text-foreground">PHC Availability</h2>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      District Mobile Fleet Capacity
+                    </p>
+                  </div>
+                  <span className="rounded bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 text-[10px] font-semibold">
+                    5 Field Units
+                  </span>
+                </div>
+
+                <ul className="space-y-2.5">
+                  {phcs.map((p) => (
+                    <li
+                      key={p.name}
+                      className="flex items-center justify-between gap-2 rounded-md border border-border bg-surface-2/60 p-2.5 text-xs"
+                    >
+                      <div>
+                        <p className="font-semibold text-foreground">{p.name}</p>
+                        <p className="text-[11px] text-muted-foreground font-mono">{p.km} km from district HQ</p>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className={`size-2.5 rounded-full ${statusDot[p.status]}`} />
+                        <span className="text-[10px] font-semibold capitalize text-muted-foreground">
+                          {p.status}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-3.5 flex items-center justify-around border-t border-border pt-2.5 text-[11px] text-muted-foreground">
+                  <Legend color="bg-emerald-500" label="Available" />
+                  <Legend color="bg-amber-500" label="Partial" />
+                  <Legend color="bg-red-500" label="Deployed" />
+                </div>
+              </section>
+
+              {/* Camp Outcomes & Training Feedback Loop */}
+              <section className="panel p-4">
+                <h2 className="label-eyebrow text-foreground mb-2">Model Feedback Loop</h2>
+                <div className="rounded-md border border-border bg-surface-2 p-3 text-xs leading-relaxed text-muted-foreground">
+                  <p className="font-semibold text-foreground mb-1">Weekly Retraining Progress</p>
+                  Last cycle 5 mobile screening camps tested <strong className="text-foreground">412 citizens</strong> and confirmed <strong className="text-foreground">59 cases</strong>. Those verified lab results were pushed back into the model, improving prediction accuracy from 84% to <strong className="text-primary font-bold">89.4%</strong>.
+                </div>
+              </section>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* TAB 2: Mobile Healthcare Camp Deployments */}
+        {activeTab === "camps" && (
+          <MobileCampDeployments additionalAssigned={assigned} />
+        )}
+
+        {/* TAB 3: Model Accuracy & Retraining Verification */}
+        {activeTab === "accuracy" && (
+          <ModelAccuracyTracker />
+        )}
       </main>
     </div>
   );
@@ -440,4 +498,3 @@ function Legend({ color, label }: { color: string; label: string }) {
     </span>
   );
 }
-
