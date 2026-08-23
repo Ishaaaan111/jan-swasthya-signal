@@ -97,6 +97,13 @@ export function AppNav() {
 
   return (
     <header className="sticky top-0 z-30 bg-surface border-b border-border shadow-xs">
+      {/* Top Tricolor Accent Ribbon */}
+      <div className="h-1 w-full flex">
+        <div className="h-full w-1/3 bg-[#FF9933]"></div>
+        <div className="h-full w-1/3 bg-white dark:bg-slate-200"></div>
+        <div className="h-full w-1/3 bg-[#138808]"></div>
+      </div>
+
       {/* Top National / State Administrative Bar */}
       <div className="bg-primary text-primary-foreground px-5 py-1 text-[11px] font-medium tracking-wide">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between">
