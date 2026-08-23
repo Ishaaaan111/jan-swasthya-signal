@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { AppNav } from "@/components/AppNav";
 import { useAuth } from "@/lib/auth";
 import { usePharmacyData, useSubmitPharmacySales } from "@/hooks/useSurveillanceData";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/pharmacy")({
   head: () => ({
@@ -44,6 +45,9 @@ function Pharmacy() {
   const handleSubmit = () => {
     setSubmitted(true);
     submitSalesMutation.mutate({ pharmacyId: "PH-TN-2204", entryCount: 18 });
+    toast.success("Confirm & Transmit Successful", {
+      description: "18 sales category summaries submitted to District Health Grid.",
+    });
   };
 
   if (!user) return null;
@@ -80,9 +84,37 @@ function Pharmacy() {
               </dl>
             </div>
 
-            <div className="mt-4 rounded-md border border-amber-200 dark:border-sky-800/60 bg-amber-50 dark:bg-sky-950/50 p-3.5 text-center">
+            <div className="mt-4 rounded-md border border-amber-200 dark:border-sky-800/60 bg-amber-50 dark:bg-sky-950/50 p-3.5 text-center shadow-xs">
               <p className="font-display text-3xl font-bold text-amber-800 dark:text-sky-300">12 Days</p>
               <p className="text-[11px] font-semibold text-amber-800 dark:text-sky-300 mt-0.5">Continuous Compliance Streak</p>
+
+              {/* Milestone Badges & Gamification Progress */}
+              <div className="mt-3 pt-3 border-t border-amber-200/60 dark:border-sky-800/40">
+                <p className="text-[10px] uppercase font-bold text-amber-900/70 dark:text-sky-300/80 mb-2">
+                  Streak Milestones
+                </p>
+                <div className="flex items-center justify-center gap-1.5 text-[10px]">
+                  <span className="rounded-full bg-amber-200 dark:bg-sky-800 text-amber-900 dark:text-sky-100 px-2 py-0.5 font-bold border border-amber-300 dark:border-sky-600 shadow-2xs">
+                    ✓ 7 Days
+                  </span>
+                  <span className="rounded-full bg-amber-100/50 dark:bg-sky-900/30 text-amber-800/60 dark:text-sky-300/60 px-2 py-0.5 font-semibold border border-amber-200/50 dark:border-sky-800/40">
+                    30 Days
+                  </span>
+                  <span className="rounded-full bg-amber-100/30 dark:bg-sky-900/20 text-amber-800/40 dark:text-sky-300/40 px-2 py-0.5 font-semibold border border-amber-200/30 dark:border-sky-800/20">
+                    90 Days
+                  </span>
+                </div>
+
+                <div className="mt-2.5 space-y-1">
+                  <div className="flex justify-between text-[10px] text-amber-800/80 dark:text-sky-300/80 font-mono">
+                    <span>Target: 30 Days</span>
+                    <span>12 / 30 (40%)</span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-amber-200/60 dark:bg-sky-900/60 overflow-hidden">
+                    <div className="h-full bg-amber-600 dark:bg-sky-400 rounded-full" style={{ width: "40%" }} />
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -107,7 +139,7 @@ function Pharmacy() {
                     <th className="px-3.5 py-2.5">#</th>
                     <th className="px-3.5 py-2.5">Medicine Category</th>
                     <th className="px-3.5 py-2.5 text-right">Units Sold</th>
-                    <th className="px-3.5 py-2.5 text-right">vs 7-Day Baseline</th>
+                    <th className="px-3.5 py-2.5 text-right">vs 7-Day Baseline &amp; Trend</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border bg-surface">
@@ -116,13 +148,20 @@ function Pharmacy() {
                       <td className="px-3.5 py-2.5 text-muted-foreground font-mono font-medium">{i + 1}</td>
                       <td className="px-3.5 py-2.5 font-semibold text-foreground">{r.cat}</td>
                       <td className="px-3.5 py-2.5 text-right font-mono font-semibold text-foreground">{r.qty} units</td>
-                      <td
-                        className={`px-3.5 py-2.5 text-right font-mono font-semibold ${
-                          r.delta >= 40 ? "text-red-600 dark:text-red-400" : r.delta > 0 ? "text-amber-600 dark:text-sky-300" : "text-muted-foreground"
-                        }`}
-                      >
-                        {r.delta > 0 ? "+" : ""}
-                        {r.delta}%
+                      <td className="px-3.5 py-2.5 text-right font-mono font-semibold">
+                        <span
+                          className={`${
+                            r.delta >= 40
+                              ? "text-red-600 dark:text-red-400"
+                              : r.delta > 0
+                                ? "text-amber-600 dark:text-sky-300"
+                                : "text-muted-foreground"
+                          }`}
+                        >
+                          {r.delta > 0 ? "+" : ""}
+                          {r.delta}%
+                        </span>
+                        <PharmacySparkline delta={r.delta} />
                       </td>
                     </tr>
                   ))}
@@ -174,5 +213,48 @@ function Pharmacy() {
         </div>
       </main>
     </div>
+  );
+}
+
+function PharmacySparkline({ delta }: { delta: number }) {
+  const isHigh = delta >= 40;
+  const isPositive = delta > 0;
+  const strokeColor = isHigh
+    ? "stroke-red-600 dark:stroke-red-400"
+    : isPositive
+      ? "stroke-amber-600 dark:stroke-sky-300"
+      : "stroke-emerald-600 dark:stroke-emerald-400";
+
+  const points = isHigh
+    ? [12, 18, 26, 45]
+    : isPositive
+      ? [15, 14, 20, 28]
+      : [25, 20, 18, 12];
+
+  const width = 36;
+  const height = 14;
+  const min = Math.min(...points);
+  const max = Math.max(...points);
+  const range = max - min || 1;
+  const pts = points
+    .map((val, idx) => {
+      const x = (idx / (points.length - 1)) * width;
+      const y = height - ((val - min) / range) * (height - 4) - 2;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+
+  return (
+    <svg width={width} height={height} className="overflow-visible inline-block opacity-85 ml-2">
+      <polyline
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={strokeColor}
+        points={pts}
+      />
+    </svg>
   );
 }
