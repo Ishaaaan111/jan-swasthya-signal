@@ -525,7 +525,7 @@ function Dashboard() {
               </div>
 
               {/* Leaflet Map Area */}
-              <div className="relative">
+              <div className="relative z-0 isolate">
                 <DistrictMap
                   zones={zones}
                   phcs={phcs}
