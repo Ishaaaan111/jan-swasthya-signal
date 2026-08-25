@@ -2,12 +2,14 @@ import { useMemo, useState, useEffect } from "react";
 import { useNavigate, createFileRoute } from "@tanstack/react-router";
 import { AppNav } from "@/components/AppNav";
 import { DistrictMap } from "@/components/DistrictMap";
+import { MobileCampDeployments } from "@/components/MobileCampDeployments";
+import { ModelAccuracyTracker } from "@/components/ModelAccuracyTracker";
 import { useAuth } from "@/lib/auth";
 import { useZones, useAlertHistory, usePhcList, useAssignCamp } from "@/hooks/useSurveillanceData";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { toast } from "sonner";
-import { Download, FileText } from "lucide-react";
+import { Download, FileText, MapPin, Truck, Stethoscope, Sparkles } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -110,6 +112,7 @@ function Dashboard() {
 
   const [selectedId, setSelectedId] = useState<string | null>("pattukkottai");
   const [assigned, setAssigned] = useState<Record<string, string>>({});
+  const [activeTab, setActiveTab] = useState<"surveillance" | "camps" | "accuracy">("surveillance");
   const [alertRiskFilter, setAlertRiskFilter] = useState<string>("all");
   const [alertDiseaseFilter, setAlertDiseaseFilter] = useState<string>("all");
   const [selectedPhcModal, setSelectedPhcModal] = useState<(typeof phcs)[number] | null>(null);
@@ -332,7 +335,55 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Dashboard 3-Column Main Grid */}
+        {/* 3 Main Command Navigation Tabs */}
+        <div className="mb-5 border-b border-border">
+          <nav className="flex space-x-4">
+            <button
+              onClick={() => setActiveTab("surveillance")}
+              className={`pb-3 px-2 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 cursor-pointer ${
+                activeTab === "surveillance"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <MapPin className="size-3.5" />
+              <span>District GIS Map & Alerts</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("camps")}
+              className={`pb-3 px-2 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 cursor-pointer ${
+                activeTab === "camps"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Truck className="size-3.5" />
+              <span>Mobile Healthcare Camps</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[10px] font-bold">
+                {Object.keys(assigned).length + 5} Active
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("accuracy")}
+              className={`pb-3 px-2 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 cursor-pointer ${
+                activeTab === "accuracy"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Stethoscope className="size-3.5" />
+              <span>ML Accuracy & Retraining Verification</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold">
+                89.4%
+              </span>
+            </button>
+          </nav>
+        </div>
+
+        {/* Tab 1: Surveillance 3-Column Main Grid */}
+        {activeTab === "surveillance" && (
         <div className="grid gap-5 lg:grid-cols-[310px_minmax(0,1fr)_320px]">
           {/* Left Column: Official Health Alert History */}
           <section className="panel p-4 flex flex-col">
@@ -781,6 +832,21 @@ function Dashboard() {
             </section>
           </div>
         </div>
+        )}
+
+        {/* Tab 2: Mobile Healthcare Camps Fleet Manager */}
+        {activeTab === "camps" && (
+          <div className="mt-2">
+            <MobileCampDeployments />
+          </div>
+        )}
+
+        {/* Tab 3: ML Accuracy & Retraining Tracker */}
+        {activeTab === "accuracy" && (
+          <div className="mt-2">
+            <ModelAccuracyTracker />
+          </div>
+        )}
 
         {/* PHC Availability Detail Modal */}
         {selectedPhcModal && (
