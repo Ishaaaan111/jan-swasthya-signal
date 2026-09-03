@@ -2,7 +2,6 @@
 
 Predictive Disease Cluster Detection and Health Care Camp System for District Health Officers.
 
-**Live app**: https://jan-swasthya-signal.lovable.app
 
 ## Development
 
