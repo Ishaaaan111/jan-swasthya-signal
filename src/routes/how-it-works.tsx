@@ -8,12 +8,12 @@ export const Route = createFileRoute("/how-it-works")({
       {
         name: "description",
         content:
-          "Five-step predictive health pipeline: collect weak signals, fuse with ML, alert the District Health Officer, deploy mobile health vans, and retrain on verified diagnoses.",
+          "Five-step predictive health pipeline: collect weak signals, fuse with ML, alert the District Health Officer, deploy healthcare camps, and retrain on verified diagnoses.",
       },
       { property: "og:title", content: "How the Jan Swasthya Signal Grid works" },
       {
         property: "og:description",
-        content: "From pharmacy sales and PoC glucometer readings to a rerouted health van in one week.",
+        content: "From pharmacy sales and PoC glucometer readings to an actionable healthcare camp deployment in one week.",
       },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -43,9 +43,9 @@ const steps = [
   },
   {
     n: "04",
-    title: "Dispatch Nearest Mobile Health Unit",
-    body: "One click assigns the nearest available Primary Health Centre (PHC) and reroutes the mobile health van off its static monthly calendar to where people are actually getting sick.",
-    items: ["Van Route Rerouted", "Field Screening Camp", "Confirmed Diagnoses"],
+    title: "Dispatch Nearest Mobile Healthcare Camp",
+    body: "One click assigns the nearest available Primary Health Centre (PHC) and schedules the healthcare camp off its static monthly calendar to where people are actually getting sick.",
+    items: ["Healthcare Camp Dispatched", "Field Screening Camp", "Confirmed Diagnoses"],
   },
   {
     n: "05",
@@ -66,11 +66,11 @@ function HowItWorks() {
           </span>
 
           <h1 className="mt-3 text-2xl sm:text-3xl font-bold font-display leading-tight text-foreground">
-            Mobile health vans follow a static schedule. Disease doesn't.
+            Healthcare camps follow a static schedule. Disease doesn't.
           </h1>
           
           <p className="mt-3 text-xs sm:text-sm leading-relaxed text-muted-foreground font-medium">
-            Every week mobile health vans visit villages based on fixed monthly calendars regardless of actual disease activity. Meanwhile 10 km away, fifty citizens develop early symptoms with zero screening. The <strong className="text-foreground">Jan Swasthya Signal Grid</strong> fuses everyday community health telemetry into actionable weekly van deployment decisions.
+            Every week healthcare camps visit villages based on fixed monthly calendars regardless of actual disease activity. Meanwhile 10 km away, fifty citizens develop early symptoms with zero screening. The <strong className="text-foreground">Jan Swasthya Signal Grid</strong> fuses everyday community health telemetry into actionable weekly healthcare camp deployment decisions.
           </p>
 
           <ol className="mt-8 space-y-4">
@@ -104,7 +104,7 @@ function HowItWorks() {
             <ul className="mt-3 space-y-2 text-xs text-muted-foreground">
               <li className="flex items-center gap-2">
                 <span className="size-1.5 rounded-full bg-primary" />
-                <strong className="text-foreground">District Health Officers:</strong> Data-driven mobile van dispatch replacing guesswork.
+                <strong className="text-foreground">District Health Officers:</strong> Data-driven healthcare camp dispatch replacing guesswork.
               </li>
               <li className="flex items-center gap-2">
                 <span className="size-1.5 rounded-full bg-primary" />

@@ -1,6 +1,6 @@
 # Jan Swasthya Signal Grid
 
-Predictive disease cluster detection and mobile health van dispatch system for district health officers.
+Predictive Disease Cluster Detection and Health Care Camp System for District Health Officers.
 
 **Live app**: https://jan-swasthya-signal.lovable.app
 

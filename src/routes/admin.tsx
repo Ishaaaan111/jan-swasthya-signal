@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { AppNav } from "@/components/AppNav";
 import { useAuth } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase";
@@ -86,12 +86,18 @@ function AdminPage() {
   const navigate = useNavigate();
   const { data: zones = [] } = useZones();
   const { data: phcs = [] } = usePhcList();
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   useEffect(() => {
     if (!user) {
       navigate({ to: "/login" });
     }
   }, [user, navigate]);
+
+  const filteredStreams = useMemo(() => {
+    if (statusFilter === "all") return recentSignalStreams;
+    return recentSignalStreams.filter((s) => s.status === statusFilter);
+  }, [statusFilter]);
 
   if (!user) return null;
 
@@ -170,9 +176,38 @@ function AdminPage() {
                   Automated fusion of pharmacy sales, PoC devices, schools, and wastewater telemetry
                 </p>
               </div>
+<<<<<<< HEAD
               <span className="rounded bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 text-[11px] font-semibold">
                 Telemetry Active · 6 Streams
               </span>
+=======
+
+              {/* Status Filter Chips */}
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-muted-foreground uppercase font-bold">Status:</span>
+                {[
+                  { id: "all", label: "All Streams" },
+                  { id: "Flagged High", label: "Flagged High" },
+                  { id: "Corroborated", label: "Corroborated" },
+                ].map((chip) => (
+                  <button
+                    key={chip.id}
+                    onClick={() => setStatusFilter(chip.id)}
+                    className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold transition-all cursor-pointer border ${
+                      statusFilter === chip.id
+                        ? chip.id === "Flagged High"
+                          ? "bg-red-600 text-white border-red-600 shadow-xs"
+                          : chip.id === "Corroborated"
+                            ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
+                            : "bg-primary text-primary-foreground border-primary shadow-xs"
+                        : "bg-surface-2 text-muted-foreground border-border hover:text-foreground"
+                    }`}
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+>>>>>>> 4958c0ea201bdf4e8fd805d1c6e3e018cef0b7fc
             </div>
 
             <div className="overflow-x-auto rounded-md border border-border">
@@ -189,25 +224,40 @@ function AdminPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border bg-surface">
-                  {recentSignalStreams.map((s) => (
+                  {filteredStreams.map((s) => (
                     <tr key={s.id} className="hover:bg-surface-2/60 transition-colors">
                       <td className="px-3.5 py-3 font-mono text-muted-foreground font-medium">{s.id}</td>
                       <td className="px-3.5 py-3 font-semibold text-foreground">{s.source}</td>
                       <td className="px-3.5 py-3 text-muted-foreground font-mono">{s.pincode}</td>
                       <td className="px-3.5 py-3">
                         <span className="font-medium text-foreground">{s.indicator}</span>
-                        <span className="ml-1.5 font-mono font-bold text-red-600">{s.anomaly}</span>
+                        <span className="ml-1.5 font-mono font-bold text-red-600 dark:text-red-400">{s.anomaly}</span>
                       </td>
-                      <td className="px-3.5 py-3 text-right font-mono font-bold text-foreground">
-                        {s.weight}%
+                      <td className="px-3.5 py-3 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="font-mono font-bold text-foreground text-[11px] min-w-[32px] text-right">
+                            {s.weight}%
+                          </span>
+                          <div className="h-1.5 w-16 rounded-full bg-surface-2 overflow-hidden border border-border/60">
+                            <div
+                              className={`h-full rounded-full transition-all ${
+                                s.weight >= 85
+                                  ? "bg-red-600 dark:bg-red-500"
+                                  : s.weight >= 65
+                                    ? "bg-amber-500"
+                                    : "bg-primary"
+                              }`}
+                              style={{ width: `${s.weight}%` }}
+                            />
+                          </div>
+                        </div>
                       </td>
                       <td className="px-3.5 py-3 text-muted-foreground font-mono">{s.time}</td>
                       <td className="px-3.5 py-3">
                         <span
                           className={`rounded px-2 py-0.5 text-[10px] font-bold ${
-                            s.status === "Flagged High"
-                              ? "bg-red-50 dark:bg-red-950/80 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800"
-                              : "bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                              ? "bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/60 dark:text-red-300 dark:border-red-800"
+                              : "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800"
                           }`}
                         >
                           {s.status}
