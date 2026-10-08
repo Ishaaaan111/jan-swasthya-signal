@@ -136,21 +136,21 @@ function AdminPage() {
             <div className="rounded-md border border-border bg-surface-2/60 p-3.5">
               <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Signals Ingested Today</p>
               <p className="mt-1.5 text-2xl font-bold font-display text-primary">4,812</p>
-              <p className="mt-0.5 text-[11px] text-emerald-700 font-semibold">↑ +14% vs 7-day avg</p>
+              <p className="mt-0.5 text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold">↑ +14% vs 7-day avg</p>
             </div>
-            <div className="rounded-md border border-red-200 bg-red-50/70 p-3.5">
-              <p className="text-[10px] uppercase font-bold text-red-800 tracking-wider">Red Disease Clusters</p>
-              <p className="mt-1.5 text-2xl font-bold font-display text-red-700">
+            <div className="rounded-md border border-red-200 dark:border-red-900/60 bg-red-50/70 dark:bg-red-950/40 p-3.5">
+              <p className="text-[10px] uppercase font-bold text-red-800 dark:text-red-300 tracking-wider">Red Disease Clusters</p>
+              <p className="mt-1.5 text-2xl font-bold font-display text-red-700 dark:text-red-400">
                 {zones.filter((z) => z.risk === "high").length} Zones
               </p>
-              <p className="mt-0.5 text-[11px] text-red-800 font-medium">Pattukkottai, Madukkur, Sethubava.</p>
+              <p className="mt-0.5 text-[11px] text-red-800 dark:text-red-300 font-medium">Pattukkottai, Madukkur, Sethubava.</p>
             </div>
-            <div className="rounded-md border border-emerald-200 bg-emerald-50/70 p-3.5">
-              <p className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider">Mobile Health Fleet</p>
-              <p className="mt-1.5 text-2xl font-bold font-display text-emerald-700">
+            <div className="rounded-md border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/70 dark:bg-emerald-950/40 p-3.5">
+              <p className="text-[10px] uppercase font-bold text-emerald-800 dark:text-emerald-300 tracking-wider">Mobile Health Fleet</p>
+              <p className="mt-1.5 text-2xl font-bold font-display text-emerald-700 dark:text-emerald-400">
                 {phcs.length} PHC Units
               </p>
-              <p className="mt-0.5 text-[11px] text-emerald-800 font-medium">100% active field coverage</p>
+              <p className="mt-0.5 text-[11px] text-emerald-800 dark:text-emerald-300 font-medium">100% active field coverage</p>
             </div>
             <div className="rounded-md border border-border bg-surface-2/60 p-3.5">
               <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Prediction Accuracy</p>
@@ -170,7 +170,7 @@ function AdminPage() {
                   Automated fusion of pharmacy sales, PoC devices, schools, and wastewater telemetry
                 </p>
               </div>
-              <span className="rounded bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 text-[11px] font-semibold">
+              <span className="rounded bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 text-[11px] font-semibold">
                 Telemetry Active · 6 Streams
               </span>
             </div>
@@ -206,8 +206,8 @@ function AdminPage() {
                         <span
                           className={`rounded px-2 py-0.5 text-[10px] font-bold ${
                             s.status === "Flagged High"
-                              ? "bg-red-50 text-red-700 border border-red-200"
-                              : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                              ? "bg-red-50 dark:bg-red-950/80 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800"
+                              : "bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
                           }`}
                         >
                           {s.status}
@@ -229,14 +229,14 @@ function AdminPage() {
                 <li className="p-3 rounded-md border border-border bg-surface-2/60">
                   <div className="flex items-center justify-between font-semibold text-foreground">
                     <span>District Health Officer</span>
-                    <span className="text-emerald-700 text-[11px] font-bold">Active · 1 Officer</span>
+                    <span className="text-emerald-700 dark:text-emerald-400 text-[11px] font-bold">Active · 1 Officer</span>
                   </div>
                   <p className="text-muted-foreground text-[11px] mt-0.5">Dr. A. Senthilkumar · Thanjavur District</p>
                 </li>
                 <li className="p-3 rounded-md border border-border bg-surface-2/60">
                   <div className="flex items-center justify-between font-semibold text-foreground">
                     <span>Pharmacy Partners</span>
-                    <span className="text-emerald-700 text-[11px] font-bold">Active · 48 Stores</span>
+                    <span className="text-emerald-700 dark:text-emerald-400 text-[11px] font-bold">Active · 48 Stores</span>
                   </div>
                   <p className="text-muted-foreground text-[11px] mt-0.5">Sri Sai Medical Store + 47 others</p>
                 </li>
@@ -256,7 +256,7 @@ function AdminPage() {
               <dl className="space-y-2 text-xs">
                 <div className="flex justify-between border-b border-border pb-1.5">
                   <dt className="text-muted-foreground font-medium">Database Sync</dt>
-                  <dd className="font-semibold text-emerald-700">
+                  <dd className="font-semibold text-emerald-700 dark:text-emerald-400">
                     {isSupabaseConfigured ? "Supabase Cloud (PostgreSQL)" : "Local In-Memory Cache"}
                   </dd>
                 </div>

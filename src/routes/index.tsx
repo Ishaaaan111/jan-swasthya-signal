@@ -29,9 +29,9 @@ export const Route = createFileRoute("/")({
 });
 
 const badgeTone = {
-  high: "bg-red-50 text-red-700 border-red-200 font-semibold",
-  watch: "bg-amber-50 text-amber-700 border-amber-200 font-semibold",
-  normal: "bg-emerald-50 text-emerald-700 border-emerald-200 font-semibold",
+  high: "bg-red-50 dark:bg-red-950/80 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800 font-semibold",
+  watch: "bg-amber-50 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 font-semibold",
+  normal: "bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 font-semibold",
 } as const;
 
 const statusDot = {
@@ -99,8 +99,8 @@ function Dashboard() {
               <span
                 className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-semibold ${
                   isSupabaseConfigured
-                    ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-                    : "border-amber-200 bg-amber-50 text-amber-800"
+                    ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300"
+                    : "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300"
                 }`}
               >
                 <span
@@ -134,33 +134,33 @@ function Dashboard() {
             <div className="rounded-md border border-border bg-surface-2/60 p-3 text-left">
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Signals Today</p>
               <p className="mt-1 text-lg font-bold font-display text-primary">4,812</p>
-              <p className="text-[10px] text-emerald-700 font-semibold mt-0.5">↑ +14% vs avg</p>
+              <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">↑ +14% vs avg</p>
             </div>
 
-            <div className="rounded-md border border-red-200 bg-red-50/70 p-3 text-left">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-red-800">High Risk Zones</p>
-              <p className="mt-1 text-lg font-bold font-display text-red-700">{counts.high} Pincodes</p>
-              <p className="text-[10px] text-red-700 font-semibold mt-0.5">Action Required</p>
+            <div className="rounded-md border border-red-200 dark:border-red-900/60 bg-red-50/70 dark:bg-red-950/40 p-3 text-left">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-red-800 dark:text-red-300">High Risk Zones</p>
+              <p className="mt-1 text-lg font-bold font-display text-red-700 dark:text-red-400">{counts.high} Pincodes</p>
+              <p className="text-[10px] text-red-700 dark:text-red-400 font-semibold mt-0.5">Action Required</p>
             </div>
 
-            <div className="rounded-md border border-amber-200 bg-amber-50/70 p-3 text-left">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-amber-800">Watch Zones</p>
-              <p className="mt-1 text-lg font-bold font-display text-amber-700">{counts.watch} Pincodes</p>
-              <p className="text-[10px] text-amber-700 font-semibold mt-0.5">Under Monitoring</p>
+            <div className="rounded-md border border-amber-200 dark:border-amber-900/60 bg-amber-50/70 dark:bg-amber-950/40 p-3 text-left">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">Watch Zones</p>
+              <p className="mt-1 text-lg font-bold font-display text-amber-700 dark:text-amber-400">{counts.watch} Pincodes</p>
+              <p className="text-[10px] text-amber-700 dark:text-amber-400 font-semibold mt-0.5">Under Monitoring</p>
             </div>
 
-            <div className="rounded-md border border-emerald-200 bg-emerald-50/70 p-3 text-left">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">Active Mobile Camps</p>
-              <p className="mt-1 text-lg font-bold font-display text-emerald-700">
+            <div className="rounded-md border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/70 dark:bg-emerald-950/40 p-3 text-left">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">Active Mobile Camps</p>
+              <p className="mt-1 text-lg font-bold font-display text-emerald-700 dark:text-emerald-400">
                 {Object.keys(assigned).length + 5} Healthcare Camps
               </p>
-              <p className="text-[10px] text-emerald-700 font-semibold mt-0.5">Deployed in District</p>
+              <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">Deployed in District</p>
             </div>
 
             <div className="rounded-md border border-border bg-surface-2/60 p-3 text-left">
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Model Accuracy</p>
               <p className="mt-1 text-lg font-bold font-display text-foreground">89.4%</p>
-              <p className="text-[10px] text-emerald-700 font-semibold mt-0.5">Retrained Weekly</p>
+              <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">Retrained Weekly</p>
             </div>
           </div>
         </div>
@@ -385,7 +385,7 @@ function Dashboard() {
                     District Mobile Fleet Capacity
                   </p>
                 </div>
-                <span className="rounded bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 text-[10px] font-semibold">
+                <span className="rounded bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 text-[10px] font-semibold">
                   5 Field Units
                 </span>
               </div>
